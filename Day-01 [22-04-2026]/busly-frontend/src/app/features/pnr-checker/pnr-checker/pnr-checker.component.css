@@ -1,0 +1,4 @@
+/* Additional component-specific styles if needed */
+.pnr-checker-container {
+  min-height: calc(100vh - 64px);
+}

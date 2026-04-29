@@ -1,0 +1,101 @@
+<div class="seat-map-container">
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="text-center py-4">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading seat map…</span>
+    </div>
+    <p class="mt-2 text-muted small">Loading seats…</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="errorMessage && !isLoading" class="alert alert-danger">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Countdown timer -->
+  <ng-container *ngIf="(countdown$ | async) as seconds">
+    <div *ngIf="seconds > 0" class="alert alert-warning d-flex align-items-center justify-content-between mb-3">
+      <div>
+        <div class="d-flex align-items-center mb-1">
+          <i class="bi bi-clock-fill me-2"></i>
+          <strong>Seats held for</strong>
+        </div>
+        <div class="countdown-display">
+          <span class="countdown-badge">{{ formatTime(seconds) }}</span>
+          <small class="text-muted ms-2">Don't refresh or navigate away</small>
+        </div>
+      </div>
+      <button class="btn btn-sm btn-outline-danger" (click)="releaseSeat()">
+        <i class="bi bi-x-circle me-1"></i>
+        Release All
+      </button>
+    </div>
+  </ng-container>
+
+  <!-- Seat map -->
+  <div *ngIf="!isLoading && decks.length > 0">
+
+    <!-- Legend -->
+    <div class="d-flex flex-wrap gap-3 mb-3 small">
+      <span><span class="seat seat-available me-1" style="width:20px;height:20px;display:inline-block;vertical-align:middle;"></span> Available</span>
+      <span><span class="seat seat-selected me-1" style="width:20px;height:20px;display:inline-block;vertical-align:middle;"></span> Selected</span>
+      <span><span class="seat seat-male me-1" style="width:20px;height:20px;display:inline-block;vertical-align:middle;"></span> Booked (M)</span>
+      <span><span class="seat seat-female me-1" style="width:20px;height:20px;display:inline-block;vertical-align:middle;"></span> Booked (F)</span>
+      <span><span class="seat seat-locked me-1" style="width:20px;height:20px;display:inline-block;vertical-align:middle;"></span> Locked</span>
+    </div>
+
+    <!-- Decks -->
+    <div *ngFor="let deck of decks" class="mb-4">
+      <div class="deck-label">{{ deck.deckName }} Deck</div>
+
+      <div *ngFor="let row of deck.rows" class="seat-row">
+        <ng-container *ngFor="let seat of row.seats">
+          <!-- Aisle gap -->
+          <div *ngIf="seat === null" class="aisle"></div>
+
+          <!-- Seat -->
+          <div
+            *ngIf="seat !== null"
+            [class]="getSeatClass(seat)"
+            [title]="seat.seatNumber ? 'Seat ' + seat.seatNumber : seat.seatId"
+            (click)="selectSeat(seat)"
+            [attr.aria-label]="'Seat ' + (seat.seatNumber ?? seat.seatId) + ' - ' + seat.status"
+            role="button"
+            [attr.tabindex]="seat.status === 'AVAILABLE' ? 0 : -1"
+            (keydown.enter)="selectSeat(seat)"
+            (keydown.space)="selectSeat(seat)"
+          >
+            {{ seat.seatNumber ?? '' }}
+          </div>
+        </ng-container>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- No seats -->
+  <div *ngIf="!isLoading && !errorMessage && decks.length === 0" class="text-center py-4 text-muted">
+    No seat information available.
+  </div>
+
+</div>
+
+<!-- Login Modal Overlay -->
+<div *ngIf="showLoginModal" class="modal d-block" tabindex="-1" role="dialog" style="background: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Sign In Required</h5>
+        <button type="button" class="btn-close" (click)="closeLoginModal()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>You need to be signed in to select a seat and proceed with booking.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeLoginModal()">Cancel</button>
+        <a routerLink="/login" class="btn btn-primary">Sign In</a>
+      </div>
+    </div>
+  </div>
+</div>

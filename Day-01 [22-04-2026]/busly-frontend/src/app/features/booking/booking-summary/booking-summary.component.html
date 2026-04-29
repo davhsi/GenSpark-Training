@@ -1,0 +1,226 @@
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+
+      <h2 class="mb-4">Booking Summary</h2>
+
+      <!-- Error alert -->
+      <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+        {{ errorMessage }}
+      </div>
+
+      <form [formGroup]="summaryForm" (ngSubmit)="onSubmit()" novalidate>
+
+        <!-- Passenger details -->
+        <div formArrayName="passengers">
+          <div
+            *ngFor="let seatInfo of seatInfo; let i = index"
+            [formGroupName]="i"
+            class="card mb-3"
+          >
+            <div class="card-header fw-semibold">
+              Passenger {{ i + 1 }} — Seat {{ seatInfo.seatNumber }}
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+
+                <!-- Name -->
+                <div class="col-md-5">
+                  <label [for]="'name-' + i" class="form-label">Full Name</label>
+                  <input
+                    [id]="'name-' + i"
+                    type="text"
+                    class="form-control"
+                    [class.is-invalid]="passengerAt(i).get('name')!.invalid && passengerAt(i).get('name')!.touched"
+                    formControlName="name"
+                    placeholder="Enter full name"
+                  />
+                  <div class="invalid-feedback">Name is required.</div>
+                </div>
+
+                <!-- Age -->
+                <div class="col-md-3">
+                  <label [for]="'age-' + i" class="form-label">Age</label>
+                  <input
+                    [id]="'age-' + i"
+                    type="number"
+                    class="form-control"
+                    [class.is-invalid]="passengerAt(i).get('age')!.invalid && passengerAt(i).get('age')!.touched"
+                    formControlName="age"
+                    placeholder="Age"
+                    min="1"
+                  />
+                  <div class="invalid-feedback">
+                    <span *ngIf="passengerAt(i).get('age')!.errors?.['required']">Age is required.</span>
+                    <span *ngIf="passengerAt(i).get('age')!.errors?.['min']">Age must be at least 1.</span>
+                  </div>
+                </div>
+
+                <!-- Gender -->
+                <div class="col-md-4">
+                  <label [for]="'gender-' + i" class="form-label">Gender</label>
+                  <select
+                    [id]="'gender-' + i"
+                    class="form-select"
+                    [class.is-invalid]="passengerAt(i).get('gender')!.invalid && passengerAt(i).get('gender')!.touched"
+                    formControlName="gender"
+                  >
+                    <option value="">Select gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                  </select>
+                  <div class="invalid-feedback">Gender is required.</div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Coupon code -->
+        <div class="card mb-3">
+          <div class="card-body">
+            <label for="couponCode" class="form-label">Coupon Code (optional)</label>
+            <div class="input-group">
+              <input
+                id="couponCode"
+                type="text"
+                class="form-control"
+                [class.is-invalid]="couponError"
+                [class.is-valid]="couponApplied"
+                formControlName="couponCode"
+                placeholder="Enter coupon code"
+                [readonly]="couponApplied"
+              />
+              <button
+                type="button"
+                class="btn btn-outline-secondary"
+                (click)="applyCoupon()"
+                [disabled]="isApplyingCoupon || couponApplied"
+              >
+                <span
+                  *ngIf="isApplyingCoupon"
+                  class="spinner-border spinner-border-sm me-1"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+                {{ isApplyingCoupon ? 'Applying…' : couponApplied ? 'Applied ✓' : 'Apply' }}
+              </button>
+            </div>
+            <div *ngIf="couponApplied" class="text-success small mt-1">
+              Coupon applied: -₹{{ couponDiscount | number:'1.2-2' }}
+            </div>
+            <div *ngIf="couponError" class="text-danger small mt-1">
+              {{ couponError }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Fare breakdown -->
+        <div class="card mb-4">
+          <div class="card-header fw-semibold">Fare Breakdown</div>
+          <div class="card-body p-0">
+            <table class="table table-borderless mb-0">
+              <tbody>
+                <tr>
+                  <td>Base Fare</td>
+                  <td class="text-end">₹{{ baseFare | number:'1.2-2' }}</td>
+                </tr>
+                <tr>
+                  <td>Convenience Fee</td>
+                  <td class="text-end">₹{{ convenienceFee | number:'1.2-2' }}</td>
+                </tr>
+                <tr *ngIf="couponApplied" class="text-success">
+                  <td>Coupon Discount</td>
+                  <td class="text-end">-₹{{ couponDiscount | number:'1.2-2' }}</td>
+                </tr>
+                <tr class="fw-bold border-top">
+                  <td>Total Amount</td>
+                  <td class="text-end">₹{{ totalAmount | number:'1.2-2' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <button
+          type="submit"
+          class="btn btn-primary w-100"
+          [disabled]="isLoading"
+        >
+          <span
+            *ngIf="isLoading"
+            class="spinner-border spinner-border-sm me-2"
+            role="status"
+            aria-hidden="true"
+          ></span>
+          {{ isLoading ? 'Processing…' : 'Proceed to Payment' }}
+        </button>
+
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<!-- T&C Re-acceptance Modal -->
+<div
+  *ngIf="showTcModal"
+  class="modal d-block"
+  tabindex="-1"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="tcModalTitle"
+  style="background: rgba(0,0,0,0.5); position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1055; overflow-y: auto;"
+>
+  <div class="modal-dialog modal-dialog-centered modal-lg" style="margin: 1.75rem auto;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="tcModalTitle">
+          <i class="bi bi-file-text me-2"></i>Terms &amp; Conditions Updated
+        </h5>
+        <button type="button" class="btn-close" (click)="closeTcModal()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+
+        <!-- Loading T&C -->
+        <div *ngIf="isLoadingTc" class="text-center py-4">
+          <div class="spinner-border text-primary" role="status"></div>
+          <p class="mt-2 text-muted small">Loading Terms &amp; Conditions…</p>
+        </div>
+
+        <!-- T&C Content -->
+        <ng-container *ngIf="!isLoadingTc && tcContent">
+          <p class="text-muted small mb-3">
+            Our Terms &amp; Conditions have been updated (version <strong>{{ tcContent.version }}</strong>,
+            effective {{ tcContent.effectiveAt || tcContent.publishedAt | date:'mediumDate' }}).
+            Please review and accept to continue with your booking.
+          </p>
+          <div
+            class="border rounded p-3 mb-3"
+            style="max-height: 300px; overflow-y: auto; background: var(--bs-light, #f8f9fa); font-size: 0.875rem; white-space: pre-wrap;"
+          >{{ tcContent.content }}</div>
+        </ng-container>
+
+        <!-- Error -->
+        <div *ngIf="tcAcceptError" class="alert alert-danger py-2 small mb-0">
+          {{ tcAcceptError }}
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" (click)="closeTcModal()">Cancel</button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="acceptTcAndRetry()"
+          [disabled]="isAcceptingTc || isLoadingTc || !tcContent"
+        >
+          <span *ngIf="isAcceptingTc" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+          {{ isAcceptingTc ? 'Accepting…' : 'I Accept — Continue Booking' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

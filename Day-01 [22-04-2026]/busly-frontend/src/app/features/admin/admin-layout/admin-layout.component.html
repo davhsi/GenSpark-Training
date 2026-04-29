@@ -1,0 +1,63 @@
+<div class="d-flex" style="min-height: 100vh;">
+
+  <!-- ── Sidebar ──────────────────────────────────────────────── -->
+  <nav class="admin-sidebar d-flex flex-column p-3" style="width: 260px; min-width: 260px;">
+
+    <div class="sidebar-logo mb-4">
+      Busly <span>Admin</span>
+    </div>
+
+    <ul class="nav flex-column gap-1 flex-grow-1">
+      <li class="nav-item">
+        <a routerLink="/admin/routes" routerLinkActive="active" class="nav-link">
+          <i class="bi bi-map sidebar-icon"></i>
+          Routes
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/admin/operators" routerLinkActive="active" class="nav-link">
+          <i class="bi bi-person-badge sidebar-icon"></i>
+          Operators
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/admin/buses" routerLinkActive="active" class="nav-link">
+          <i class="bi bi-bus-front sidebar-icon"></i>
+          Buses
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/admin/revenue" routerLinkActive="active" class="nav-link">
+          <i class="bi bi-bar-chart-line sidebar-icon"></i>
+          Revenue
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/admin/tc" routerLinkActive="active" class="nav-link">
+          <i class="bi bi-file-text sidebar-icon"></i>
+          T&amp;C Management
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/admin/audit" routerLinkActive="active" class="nav-link">
+          <i class="bi bi-clock-history sidebar-icon"></i>
+          Audit Logs
+        </a>
+      </li>
+    </ul>
+
+    <div class="mt-auto pt-3" style="border-top: 1px solid var(--gray-200);">
+      <a routerLink="/login" class="nav-link" style="color: #DC2626 !important;">
+        <i class="bi bi-box-arrow-left sidebar-icon" style="color: #DC2626 !important;"></i>
+        Logout
+      </a>
+    </div>
+
+  </nav>
+
+  <!-- ── Main Content ──────────────────────────────────────────── -->
+  <main class="admin-main flex-grow-1 p-4 p-lg-5">
+    <router-outlet></router-outlet>
+  </main>
+
+</div>

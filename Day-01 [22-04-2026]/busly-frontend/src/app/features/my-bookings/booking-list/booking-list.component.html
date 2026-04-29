@@ -1,0 +1,213 @@
+<div class="container py-4">
+
+  <h2 class="mb-4">My Bookings</h2>
+
+  <!-- Loading spinner -->
+  <div *ngIf="isLoading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading bookings…</span>
+    </div>
+  </div>
+
+  <!-- Error messages -->
+  <div *ngIf="errorMessage" class="alert alert-danger mt-3">
+    {{ errorMessage }}
+  </div>
+  <div *ngIf="cancelError" class="alert alert-danger mt-3">
+    {{ cancelError }}
+  </div>
+
+  <!-- Download error -->
+  <div *ngIf="downloadError" class="alert alert-warning" role="alert">
+    {{ downloadError }}
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="!isLoading && !errorMessage && bookings.length === 0" class="text-center py-5 text-muted">
+    <p class="fs-5">You have no bookings yet.</p>
+    <a routerLink="/search" class="btn btn-primary">Search Buses</a>
+  </div>
+
+  <!-- Bookings table (desktop) -->
+  <div *ngIf="!isLoading && bookings.length > 0" class="d-none d-md-block">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th scope="col">PNR</th>
+            <th scope="col">Journey Date</th>
+            <th scope="col">Status</th>
+            <th scope="col" class="text-end">Total Amount</th>
+            <th scope="col" class="text-center">Ticket</th>
+            <th scope="col" class="text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let booking of bookings">
+            <td class="fw-semibold">{{ booking.pnr }}</td>
+            <td>{{ booking.journeyDate }}</td>
+            <td>
+              <span class="badge" [ngClass]="statusBadgeClass(booking.status)">
+                {{ booking.status }}
+              </span>
+            </td>
+            <td class="text-end">
+              <span *ngIf="booking.totalAmount != null">
+                ₹{{ booking.totalAmount | number:'1.2-2' }}
+              </span>
+              <span *ngIf="booking.totalAmount == null" class="text-muted">—</span>
+            </td>
+            <td class="text-center">
+              <button
+                *ngIf="booking.status === 'CONFIRMED'"
+                type="button"
+                class="btn btn-sm btn-outline-primary"
+                (click)="downloadTicket(booking)"
+                [disabled]="downloadingId === booking.id"
+              >
+                <span
+                  *ngIf="downloadingId === booking.id"
+                  class="spinner-border spinner-border-sm me-1"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+                {{ downloadingId === booking.id ? 'Downloading…' : '⬇ Download' }}
+              </button>
+              <span *ngIf="booking.status !== 'CONFIRMED'" class="text-muted small">—</span>
+            </td>
+            <td class="text-center">
+              <ng-container *ngIf="canCancel(booking)">
+                <div class="text-muted small mb-1">
+                  Estimated refund: ₹{{ (refundPreview[booking.id] !== undefined ? refundPreview[booking.id] : getRefundPreview(booking)) | number:'1.2-2' }}
+                </div>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="cancelBooking(booking)"
+                  [disabled]="cancellingId === booking.id"
+                >
+                  <span
+                    *ngIf="cancellingId === booking.id"
+                    class="spinner-border spinner-border-sm me-1"
+                    role="status"
+                    aria-hidden="true"
+                  ></span>
+                  {{ cancellingId === booking.id ? 'Cancelling…' : '✕ Cancel' }}
+                </button>
+              </ng-container>
+              <span *ngIf="!canCancel(booking)" class="text-muted small">—</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Bookings cards (mobile) -->
+  <div *ngIf="!isLoading && bookings.length > 0" class="d-md-none">
+    <div *ngFor="let booking of bookings" class="card mb-3">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div>
+            <div class="fw-bold">{{ booking.pnr }}</div>
+            <div class="text-muted small">{{ booking.journeyDate }}</div>
+          </div>
+          <span class="badge" [ngClass]="statusBadgeClass(booking.status)">
+            {{ booking.status }}
+          </span>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="fw-semibold">
+            <span *ngIf="booking.totalAmount != null">₹{{ booking.totalAmount | number:'1.2-2' }}</span>
+            <span *ngIf="booking.totalAmount == null" class="text-muted">—</span>
+          </div>
+          <div class="d-flex gap-2 align-items-center">
+            <button
+              *ngIf="booking.status === 'CONFIRMED'"
+              type="button"
+              class="btn btn-sm btn-outline-primary"
+              (click)="downloadTicket(booking)"
+              [disabled]="downloadingId === booking.id"
+            >
+              <span
+                *ngIf="downloadingId === booking.id"
+                class="spinner-border spinner-border-sm me-1"
+                role="status"
+                aria-hidden="true"
+              ></span>
+              {{ downloadingId === booking.id ? 'Downloading…' : '⬇ Download' }}
+            </button>
+            <ng-container *ngIf="canCancel(booking)">
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-danger"
+                (click)="cancelBooking(booking)"
+                [disabled]="cancellingId === booking.id"
+              >
+                <span
+                  *ngIf="cancellingId === booking.id"
+                  class="spinner-border spinner-border-sm me-1"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+                {{ cancellingId === booking.id ? 'Cancelling…' : '✕ Cancel' }}
+              </button>
+            </ng-container>
+          </div>
+        </div>
+        <div *ngIf="canCancel(booking)" class="text-muted small mt-1">
+          Estimated refund: ₹{{ (refundPreview[booking.id] !== undefined ? refundPreview[booking.id] : getRefundPreview(booking)) | number:'1.2-2' }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- Custom Cancellation Dialog -->
+<div *ngIf="showCancelDialog" class="custom-dialog-overlay" (click)="onCancelDialog()">
+  <div class="custom-dialog" (click)="$event.stopPropagation()">
+    <app-cancel-booking-dialog 
+      [data]="cancelDialogData"
+      (cancel)="onCancelDialog()"
+      (confirm)="onConfirmCancel()">
+    </app-cancel-booking-dialog>
+  </div>
+</div>
+
+<style>
+.custom-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.custom-dialog {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+</style>
+
+</div>

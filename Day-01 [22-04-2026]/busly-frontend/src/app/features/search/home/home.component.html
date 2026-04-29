@@ -1,0 +1,191 @@
+<!-- ── Hero Section ──────────────────────────────────────────── -->
+<section class="hero-section">
+  <div class="container text-center">
+    <div class="row justify-content-center">
+      <div class="col-lg-9">
+
+        <!-- Eyebrow -->
+        <p class="fw-semibold mb-3 animate-fade-up"
+           style="color: var(--blue); font-size: 0.875rem; letter-spacing: 0.04em;">
+          <i class="bi bi-bus-front me-1"></i> Thousands of routes. One simple search.
+        </p>
+
+        <h1 class="display-heading animate-fade-up animate-fade-up-delay-1"
+            style="font-size: clamp(2rem, 5vw, 3rem); color: var(--gray-900); margin-bottom: 1rem;">
+          Travel Smarter,<br>Book Faster
+        </h1>
+
+        <p class="animate-fade-up animate-fade-up-delay-2"
+           style="color: var(--gray-500); font-size: 1rem; max-width: 460px; margin: 0 auto 2.5rem;">
+          Discover routes and book your bus tickets in seconds with Busly.
+        </p>
+
+        <!-- Search Card -->
+        <div class="search-card mx-auto animate-fade-up animate-fade-up-delay-3" style="max-width: 860px;">
+          <form [formGroup]="searchForm" (ngSubmit)="onSubmit()" novalidate>
+            <div class="row g-3 align-items-end">
+
+              <!-- From -->
+              <div class="col-md-4 position-relative text-start">
+                <label for="from" class="form-label">
+                  <i class="bi bi-geo-alt me-1" style="color: var(--blue);"></i>From
+                </label>
+                <input
+                  id="from"
+                  type="text"
+                  class="form-control"
+                  [class.is-invalid]="from.invalid && from.touched"
+                  formControlName="from"
+                  placeholder="Departure city"
+                  autocomplete="off"
+                  (input)="onFromInput($event)"
+                />
+                <ul *ngIf="fromSuggestions.length > 0"
+                    class="list-group position-absolute w-100"
+                    style="z-index: 1000; top: calc(100% + 4px);">
+                  <li *ngFor="let city of fromSuggestions"
+                      class="list-group-item list-group-item-action py-2"
+                      style="cursor: pointer;"
+                      (mousedown)="selectFrom(city)">
+                    <i class="bi bi-geo-alt me-2" style="color: var(--blue);"></i>{{ city }}
+                  </li>
+                </ul>
+              </div>
+
+              <!-- To -->
+              <div class="col-md-4 position-relative text-start">
+                <label for="to" class="form-label">
+                  <i class="bi bi-geo-alt-fill me-1" style="color: var(--blue);"></i>To
+                </label>
+                <input
+                  id="to"
+                  type="text"
+                  class="form-control"
+                  [class.is-invalid]="to.invalid && to.touched"
+                  formControlName="to"
+                  placeholder="Destination city"
+                  autocomplete="off"
+                  (input)="onToInput($event)"
+                />
+                <ul *ngIf="toSuggestions.length > 0"
+                    class="list-group position-absolute w-100"
+                    style="z-index: 1000; top: calc(100% + 4px);">
+                  <li *ngFor="let city of toSuggestions"
+                      class="list-group-item list-group-item-action py-2"
+                      style="cursor: pointer;"
+                      (mousedown)="selectTo(city)">
+                    <i class="bi bi-geo-alt-fill me-2" style="color: var(--blue);"></i>{{ city }}
+                  </li>
+                </ul>
+              </div>
+
+              <!-- Date -->
+              <div class="col-md-3 text-start">
+                <label for="date" class="form-label">
+                  <i class="bi bi-calendar3 me-1" style="color: var(--blue);"></i>Date
+                </label>
+                <input
+                  id="date"
+                  type="date"
+                  class="form-control"
+                  [class.is-invalid]="date.invalid && date.touched"
+                  formControlName="date"
+                  [min]="minDate"
+                  [max]="maxDate"
+                />
+                <div *ngIf="date.invalid && date.touched" class="invalid-feedback d-block text-start" style="font-size: 0.75rem;">
+                  <span *ngIf="date.errors?.['pastDate']">Select today or a future date.</span>
+                  <span *ngIf="date.errors?.['tooFarFuture']">Max 90 days in advance.</span>
+                  <span *ngIf="date.errors?.['required']">Date is required.</span>
+                </div>
+              </div>
+
+              <!-- Search Button -->
+              <div class="col-md-1 d-flex align-items-end">
+                <button
+                  type="submit"
+                  class="btn btn-primary w-100 d-flex align-items-center justify-content-center"
+                  style="height: 48px; border-radius: var(--radius-sm);"
+                  aria-label="Search buses"
+                >
+                  <i class="bi bi-search fs-5"></i>
+                </button>
+              </div>
+
+            </div>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Features Section ──────────────────────────────────────── -->
+<section style="background: var(--white); padding: 72px 0; border-top: 1px solid var(--gray-200);">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 style="font-family: var(--font-display); font-weight: 700; font-size: 1.75rem; color: var(--gray-900);">Why Travel with Busly?</h2>
+      <p style="color: var(--gray-500); margin-top: 0.5rem; font-size: 0.95rem;">Simple, reliable, and built for everyday travellers.</p>
+    </div>
+
+    <div class="row g-4 text-center">
+      <div class="col-md-4 animate-fade-up">
+        <div class="card h-100 p-4" style="border-radius: var(--radius-lg); border-color: var(--gray-200);">
+          <div class="feature-icon mx-auto">
+            <i class="bi bi-shield-check"></i>
+          </div>
+          <h3 class="h5 fw-bold mb-2" style="color: var(--gray-900);">Safe &amp; Secure</h3>
+          <p style="color: var(--gray-500); font-size: 0.9rem; margin: 0;">
+            Verified operators only. Gender-based seat selection for your peace of mind.
+          </p>
+        </div>
+      </div>
+      <div class="col-md-4 animate-fade-up animate-fade-up-delay-1">
+        <div class="card h-100 p-4" style="border-radius: var(--radius-lg); border-color: var(--gray-200);">
+          <div class="feature-icon mx-auto">
+            <i class="bi bi-lightning-charge"></i>
+          </div>
+          <h3 class="h5 fw-bold mb-2" style="color: var(--gray-900);">Instant Booking</h3>
+          <p style="color: var(--gray-500); font-size: 0.9rem; margin: 0;">
+            Book in seconds. Receive your PDF ticket instantly via email after payment.
+          </p>
+        </div>
+      </div>
+      <div class="col-md-4 animate-fade-up animate-fade-up-delay-2">
+        <div class="card h-100 p-4" style="border-radius: var(--radius-lg); border-color: var(--gray-200);">
+          <div class="feature-icon mx-auto">
+            <i class="bi bi-headset"></i>
+          </div>
+          <h3 class="h5 fw-bold mb-2" style="color: var(--gray-900);">24/7 Support</h3>
+          <p style="color: var(--gray-500); font-size: 0.9rem; margin: 0;">
+            Our team is here for any queries or cancellations, any time of day.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ────────────────────────────────────────────────── -->
+<footer style="background: var(--white); border-top: 1px solid var(--gray-200); padding: 40px 0; text-align: center;">
+  <div class="container">
+    <a class="d-inline-block mb-3" routerLink="/"
+       style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; color: var(--blue); text-decoration: none; letter-spacing: -0.03em;">
+      Busly
+    </a>
+    <p style="color: var(--gray-400); font-size: 0.85rem; margin-bottom: 1rem;">
+      &copy; 2026 Busly Ticket Booking Platform. All rights reserved.
+    </p>
+    <div>
+      <a href="#" style="color: var(--gray-400); font-size: 0.85rem; text-decoration: none; margin-right: 1.5rem; transition: color 0.15s;"
+         onmouseover="this.style.color='var(--blue)'" onmouseout="this.style.color='var(--gray-400)'">
+        Privacy Policy
+      </a>
+      <a href="#" style="color: var(--gray-400); font-size: 0.85rem; text-decoration: none; transition: color 0.15s;"
+         onmouseover="this.style.color='var(--blue)'" onmouseout="this.style.color='var(--gray-400)'">
+        Terms of Service
+      </a>
+    </div>
+  </div>
+</footer>

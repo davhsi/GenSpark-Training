@@ -1,0 +1,255 @@
+<div class="animate-fade-up">
+
+  <!-- Page Header -->
+  <div class="mb-5">
+    <h2 class="display-heading mb-1" style="font-size: 1.75rem;">Platform Revenue</h2>
+    <p style="color: var(--slate); font-size: 0.9rem; margin: 0;">Convenience fees and booking analytics across all operators.</p>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="text-center py-5">
+    <div class="spinner-border" role="status" style="width: 2.5rem; height: 2.5rem;">
+      <span class="visually-hidden">Loading revenue data…</span>
+    </div>
+    <p style="color: var(--slate); margin-top: 1rem; font-size: 0.9rem;">Loading revenue data…</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ errorMessage }}
+  </div>
+
+  <ng-container *ngIf="!isLoading">
+
+    <!-- Summary Cards -->
+    <div class="row mb-4 g-3">
+
+      <div class="col-md-4 animate-fade-up">
+        <div class="card h-100">
+          <div class="card-body p-4">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+              <div style="
+                width: 40px; height: 40px; border-radius: 10px;
+                background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2);
+                display: flex; align-items: center; justify-content: center;
+                color: #4ade80; font-size: 1.1rem;
+              ">
+                <i class="bi bi-currency-rupee"></i>
+              </div>
+              <span style="color: var(--slate); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;">
+                Total Revenue
+              </span>
+            </div>
+            <div style="font-family: var(--font-display); font-size: 2rem; font-weight: 800; color: #4ade80; line-height: 1;">
+              ₹{{ totalRevenue | number:'1.2-2' }}
+            </div>
+            <p style="color: var(--slate-dim); font-size: 0.8rem; margin: 0.5rem 0 0;">Total convenience fees collected</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4 animate-fade-up animate-fade-up-delay-1">
+        <div class="card h-100">
+          <div class="card-body p-4">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+              <div style="
+                width: 40px; height: 40px; border-radius: 10px;
+                background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.2);
+                display: flex; align-items: center; justify-content: center;
+                color: var(--indigo-bright); font-size: 1.1rem;
+              ">
+                <i class="bi bi-people"></i>
+              </div>
+              <span style="color: var(--slate); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;">
+                Active Operators
+              </span>
+            </div>
+            <div style="font-family: var(--font-display); font-size: 2rem; font-weight: 800; color: var(--indigo-bright); line-height: 1;">
+              {{ operatorRevenue.length }}
+            </div>
+            <p style="color: var(--slate-dim); font-size: 0.8rem; margin: 0.5rem 0 0;">Companies registered on Busly</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4 animate-fade-up animate-fade-up-delay-2">
+        <div class="card h-100">
+          <div class="card-body p-4">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+              <div style="
+                width: 40px; height: 40px; border-radius: 10px;
+                background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.2);
+                display: flex; align-items: center; justify-content: center;
+                color: #22d3ee; font-size: 1.1rem;
+              ">
+                <i class="bi bi-ticket-perforated"></i>
+              </div>
+              <span style="color: var(--slate); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;">
+                Total Bookings
+              </span>
+            </div>
+            <div style="font-family: var(--font-display); font-size: 2rem; font-weight: 800; color: #22d3ee; line-height: 1;">
+              {{ totalBookingCount | number:'1.0-0' }}
+            </div>
+            <p style="color: var(--slate-dim); font-size: 0.8rem; margin: 0.5rem 0 0;">Confirmed tickets across all routes</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Convenience Fee Config -->
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-sliders me-2" style="color: var(--indigo-bright);"></i>Convenience Fee Settings</span>
+        <button
+          *ngIf="!isEditingFee && !isFeeLoading"
+          class="btn btn-sm btn-outline-secondary"
+          (click)="startEditFee()"
+        >
+          <i class="bi bi-pencil me-1"></i>Edit
+        </button>
+      </div>
+      <div class="card-body p-4">
+
+        <!-- Loading -->
+        <div *ngIf="isFeeLoading" class="text-center py-3">
+          <div class="spinner-border spinner-border-sm text-secondary" role="status"></div>
+        </div>
+
+        <!-- Read view -->
+        <ng-container *ngIf="!isFeeLoading && !isEditingFee">
+          <div class="d-flex align-items-center gap-3">
+            <div style="font-size: 1.5rem; font-weight: 700; font-family: var(--font-display); color: var(--indigo-bright);">
+              {{ feeLabel() }}
+            </div>
+            <span *ngIf="feeSaved" class="badge bg-success">
+              <i class="bi bi-check-lg me-1"></i>Saved
+            </span>
+          </div>
+          <p style="color: var(--slate-dim); font-size: 0.8rem; margin: 0.4rem 0 0;">
+            This fee is added to every booking and collected as platform revenue.
+          </p>
+        </ng-container>
+
+        <!-- Edit form -->
+        <form *ngIf="!isFeeLoading && isEditingFee" [formGroup]="feeForm" (ngSubmit)="saveFeeConfig()">
+          <div class="row g-3 align-items-end">
+            <div class="col-sm-4">
+              <label class="form-label fw-semibold" style="font-size: 0.8rem;">Fee Type</label>
+              <select class="form-select form-select-sm" formControlName="feeType">
+                <option value="flat">Flat (₹ per booking)</option>
+                <option value="percent">Percent (% of base fare)</option>
+              </select>
+            </div>
+            <div class="col-sm-4">
+              <label class="form-label fw-semibold" style="font-size: 0.8rem;">
+                {{ feeForm.get('feeType')?.value === 'percent' ? 'Percentage (%)' : 'Amount (₹)' }}
+              </label>
+              <div class="input-group input-group-sm">
+                <span class="input-group-text">{{ feeForm.get('feeType')?.value === 'percent' ? '%' : '₹' }}</span>
+                <input
+                  type="number"
+                  class="form-control"
+                  formControlName="feeValue"
+                  min="0"
+                  [max]="feeForm.get('feeType')?.value === 'percent' ? 100 : null"
+                  step="0.01"
+                  [class.is-invalid]="feeForm.get('feeValue')?.invalid && feeForm.get('feeValue')?.touched"
+                />
+                <div class="invalid-feedback">Enter a valid non-negative value.</div>
+              </div>
+            </div>
+            <div class="col-sm-4 d-flex gap-2">
+              <button type="submit" class="btn btn-sm btn-primary" [disabled]="isSavingFee || feeForm.invalid">
+                <span *ngIf="isSavingFee" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                {{ isSavingFee ? 'Saving…' : 'Save' }}
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-secondary" (click)="cancelEditFee()">Cancel</button>
+            </div>
+          </div>
+          <div *ngIf="feeError" class="alert alert-danger py-2 small mt-3 mb-0">
+            {{ feeError }}
+          </div>
+        </form>
+
+      </div>
+    </div>
+
+    <!-- Revenue Chart -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <i class="bi bi-graph-up me-2" style="color: var(--indigo-bright);"></i>Revenue Growth
+      </div>
+      <div class="card-body p-4">
+        <div style="height: 300px;">
+          <canvas #revenueChart></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Monthly Revenue Table -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <i class="bi bi-calendar3 me-2" style="color: var(--indigo-bright);"></i>Monthly Revenue
+      </div>
+      <div class="card-body p-0">
+        <div *ngIf="monthlyRevenue.length === 0" class="text-center py-4" style="color: var(--slate);">
+          No monthly revenue data available.
+        </div>
+        <div *ngIf="monthlyRevenue.length > 0" class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Year</th>
+                <th>Month</th>
+                <th class="text-end">Convenience Fee</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of monthlyRevenue">
+                <td>{{ row.year }}</td>
+                <td>{{ monthName(row.month) }}</td>
+                <td class="text-end fw-semibold" style="color: #4ade80;">₹{{ row.totalConvenienceFee | number:'1.2-2' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Per-Operator Revenue Table -->
+    <div class="card">
+      <div class="card-header">
+        <i class="bi bi-building me-2" style="color: var(--indigo-bright);"></i>Revenue by Operator
+      </div>
+      <div class="card-body p-0">
+        <div *ngIf="operatorRevenue.length === 0" class="text-center py-4" style="color: var(--slate);">
+          No operator revenue data available.
+        </div>
+        <div *ngIf="operatorRevenue.length > 0" class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Operator</th>
+                <th class="text-end">Bookings</th>
+                <th class="text-end">Base Fare</th>
+                <th class="text-end">Convenience Fee</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of operatorRevenue">
+                <td class="fw-medium">{{ row.operatorName ?? '—' }}</td>
+                <td class="text-end">{{ row.bookingCount }}</td>
+                <td class="text-end" style="color: var(--slate);">₹{{ row.totalBaseFare | number:'1.2-2' }}</td>
+                <td class="text-end fw-semibold" style="color: #4ade80;">₹{{ row.totalConvenienceFee | number:'1.2-2' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </ng-container>
+
+</div>

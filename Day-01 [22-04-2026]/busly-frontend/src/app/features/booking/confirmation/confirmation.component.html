@@ -1,0 +1,54 @@
+<div class="container d-flex justify-content-center align-items-center min-vh-100">
+  <div class="card shadow-sm text-center" style="width: 100%; max-width: 480px;">
+    <div class="card-body p-5">
+
+      <!-- Success icon -->
+      <div class="mb-3">
+        <span class="display-1 text-success">✓</span>
+      </div>
+
+      <h2 class="card-title mb-2">Booking Confirmed!</h2>
+      <p class="text-muted mb-4">Your seats have been reserved successfully.</p>
+
+      <!-- PNR -->
+      <div class="alert alert-success py-3 mb-4" role="status">
+        <div class="small text-muted mb-1">Your PNR Number</div>
+        <div class="fs-3 fw-bold letter-spacing-wide">{{ pnr }}</div>
+      </div>
+
+      <!-- Email notice -->
+      <p class="text-muted small mb-4">
+        <span class="me-1">📧</span>
+        A confirmation email with your ticket details has been sent to your registered email address.
+      </p>
+
+      <!-- Download error -->
+      <div *ngIf="downloadError" class="alert alert-danger small" role="alert">
+        {{ downloadError }}
+      </div>
+
+      <!-- Actions -->
+      <div class="d-grid gap-2">
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="downloadTicket()"
+          [disabled]="isDownloading"
+        >
+          <span
+            *ngIf="isDownloading"
+            class="spinner-border spinner-border-sm me-2"
+            role="status"
+            aria-hidden="true"
+          ></span>
+          {{ isDownloading ? 'Downloading…' : '⬇ Download Ticket' }}
+        </button>
+
+        <a routerLink="/my-bookings" class="btn btn-outline-secondary">
+          View My Bookings
+        </a>
+      </div>
+
+    </div>
+  </div>
+</div>

@@ -1,0 +1,50 @@
+<div class="d-flex min-vh-100">
+  <!-- Sidebar -->
+  <nav class="admin-sidebar d-flex flex-column p-3" style="width: 260px; min-width: 260px;">
+    <div class="sidebar-logo mb-3">
+      Busly <span class="text-primary">Operator</span>
+    </div>
+
+    <ul class="nav flex-column gap-1">
+      <li class="nav-item">
+        <a
+          routerLink="/operator/dashboard"
+          routerLinkActive="active"
+          class="nav-link"
+        >
+          <span class="me-2">📊</span> Dashboard
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          routerLink="/operator/buses"
+          routerLinkActive="active"
+          class="nav-link"
+        >
+          <span class="me-2">🚌</span> Buses
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          routerLink="/operator/layouts"
+          routerLinkActive="active"
+          class="nav-link"
+        >
+          <span class="me-2">🪑</span> Layouts
+        </a>
+      </li>
+    </ul>
+
+    <div class="mt-auto p-2">
+      <hr class="border-secondary opacity-25">
+      <a routerLink="/login" class="nav-link text-danger-emphasis small opacity-75">
+        <span>🚪</span> Logout
+      </a>
+    </div>
+  </nav>
+
+  <!-- Main content -->
+  <main class="flex-grow-1 p-4 bg-light">
+    <router-outlet></router-outlet>
+  </main>
+</div>

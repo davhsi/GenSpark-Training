@@ -1,0 +1,47 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2 class="dialog-title">Confirm Cancellation</h2>
+  </div>
+
+  <div class="dialog-content">
+    <div class="warning-icon">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 9V13M12 17H12.01M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" 
+              stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <div class="message-content">
+      <p class="main-message">
+        Cancel booking <strong>{{ data.pnr }}</strong>?
+      </p>
+      
+      <div class="refund-info">
+        <div class="refund-row">
+          <span class="refund-label">Estimated refund:</span>
+          <span class="refund-amount">₹{{ data.refundAmount.toFixed(2) }}</span>
+        </div>
+        <div class="refund-percentage" *ngIf="data.refundPercentage > 0">
+          <span class="percentage-badge">{{ data.refundPercentage }}% of base fare</span>
+        </div>
+      </div>
+
+      <div class="warning-message">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 9V13M12 17H12.01M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" 
+                stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>This action cannot be undone.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="dialog-actions">
+    <button mat-button class="cancel-btn" (click)="onCancel()">
+      Cancel
+    </button>
+    <button mat-raised-button class="confirm-btn" (click)="onConfirm()">
+      Confirm Cancellation
+    </button>
+  </div>
+</div>

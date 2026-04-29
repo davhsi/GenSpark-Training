@@ -1,0 +1,128 @@
+<div class="animate-fade-up">
+
+  <!-- Page Header -->
+  <div class="mb-5">
+    <h2 class="display-heading mb-1" style="font-size: 1.75rem;">Route Management</h2>
+    <p style="color: var(--slate); font-size: 0.9rem; margin: 0;">Add and manage bus routes across the platform.</p>
+  </div>
+
+  <!-- Error message -->
+  <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible mb-4" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ errorMessage }}
+    <button type="button" class="btn-close" (click)="errorMessage = null" aria-label="Close"></button>
+  </div>
+
+  <!-- Add Route Card -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <i class="bi bi-plus-circle me-2" style="color: var(--indigo-bright);"></i>Add New Route
+    </div>
+    <div class="card-body p-4">
+      <form [formGroup]="routeForm" (ngSubmit)="createRoute()" novalidate>
+        <div class="row g-3 align-items-end">
+
+          <div class="col-md-4">
+            <label for="sourceCity" class="form-label">Source City</label>
+            <input
+              id="sourceCity"
+              type="text"
+              class="form-control"
+              [class.is-invalid]="sourceCity.invalid && sourceCity.touched"
+              formControlName="sourceCity"
+              placeholder="e.g. Karachi"
+            />
+            <div class="invalid-feedback">Source city is required.</div>
+          </div>
+
+          <div class="col-md-4">
+            <label for="destinationCity" class="form-label">Destination City</label>
+            <input
+              id="destinationCity"
+              type="text"
+              class="form-control"
+              [class.is-invalid]="destinationCity.invalid && destinationCity.touched"
+              formControlName="destinationCity"
+              placeholder="e.g. Lahore"
+            />
+            <div class="invalid-feedback">Destination city is required.</div>
+          </div>
+
+          <div class="col-md-4">
+            <button
+              type="submit"
+              class="btn btn-primary w-100"
+              style="height: 48px;"
+              [disabled]="isSubmitting"
+            >
+              <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              <i *ngIf="!isSubmitting" class="bi bi-plus-lg me-2"></i>
+              {{ isSubmitting ? 'Adding…' : 'Add Route' }}
+            </button>
+          </div>
+
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Routes Table Card -->
+  <div class="card">
+    <div class="card-header">
+      <i class="bi bi-map me-2" style="color: var(--indigo-bright);"></i>All Routes
+    </div>
+    <div class="card-body p-0">
+
+      <!-- Empty state -->
+      <div *ngIf="routes.length === 0" class="text-center py-5">
+        <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"
+             style="margin-bottom: 1rem; opacity: 0.3;">
+          <rect x="8" y="20" width="48" height="28" rx="6" stroke="#6366F1" stroke-width="2"/>
+          <circle cx="18" cy="48" r="5" stroke="#6366F1" stroke-width="2"/>
+          <circle cx="46" cy="48" r="5" stroke="#6366F1" stroke-width="2"/>
+          <rect x="14" y="26" width="10" height="8" rx="2" stroke="#6366F1" stroke-width="1.5"/>
+          <rect x="28" y="26" width="10" height="8" rx="2" stroke="#6366F1" stroke-width="1.5"/>
+          <rect x="42" y="26" width="6" height="8" rx="2" stroke="#6366F1" stroke-width="1.5"/>
+          <path d="M8 32H4M60 32H56" stroke="#6366F1" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <p style="color: var(--slate); font-size: 0.9rem; margin: 0;">No routes found. Add your first route above.</p>
+      </div>
+
+      <!-- Table -->
+      <div *ngIf="routes.length > 0" class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Source City</th>
+              <th>Destination City</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let route of routes">
+              <td class="fw-medium">{{ route.sourceCity }}</td>
+              <td class="fw-medium">{{ route.destinationCity }}</td>
+              <td>
+                <span class="badge" [class.bg-success]="route.isActive" [class.bg-secondary]="!route.isActive">
+                  {{ route.isActive ? 'Active' : 'Inactive' }}
+                </span>
+              </td>
+              <td>
+                <button
+                  class="btn btn-sm"
+                  [class.btn-outline-danger]="route.isActive"
+                  [class.btn-outline-success]="!route.isActive"
+                  (click)="toggleRoute(route.id)"
+                >
+                  {{ route.isActive ? 'Deactivate' : 'Activate' }}
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+</div>

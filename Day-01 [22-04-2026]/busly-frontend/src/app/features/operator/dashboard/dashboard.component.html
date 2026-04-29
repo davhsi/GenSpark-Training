@@ -1,0 +1,203 @@
+<div class="container-fluid py-4">
+
+  <h2 class="mb-4">Operator Dashboard</h2>
+
+  <!-- Profile Loading -->
+  <div *ngIf="isProfileLoading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading profile…</span>
+    </div>
+  </div>
+
+  <!-- Approval Status Messages -->
+  <div *ngIf="!isProfileLoading && operatorProfile" class="mb-4">
+    <!-- Pending Approval -->
+    <div *ngIf="operatorProfile.isPending" class="alert alert-warning" role="alert">
+      <div class="d-flex align-items-center">
+        <div class="me-3">
+          <div class="spinner-border text-warning me-2" role="status">
+            <span class="visually-hidden">Loading…</span>
+          </div>
+        </div>
+        <div>
+          <h5 class="alert-heading mb-1">Waiting for Admin Approval</h5>
+          <p class="mb-0">Your operator account is currently pending approval from the system administrator. You'll be able to add buses and manage bookings once your account is approved.</p>
+          <small class="text-muted" *ngIf="operatorProfile.createdAt">Account created on {{ operatorProfile.createdAt | date:'medium' }}</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rejected -->
+    <div *ngIf="operatorProfile.isRejected" class="alert alert-danger" role="alert">
+      <h5 class="alert-heading mb-1">Account Rejected</h5>
+      <p class="mb-0">Your operator account has been rejected. Please contact support for more information.</p>
+    </div>
+
+    <!-- Disabled -->
+    <div *ngIf="operatorProfile.isDisabled" class="alert alert-secondary" role="alert">
+      <h5 class="alert-heading mb-1">Account Disabled</h5>
+      <p class="mb-0">Your operator account has been disabled. Please contact support for more information.</p>
+    </div>
+  </div>
+
+  <ng-container *ngIf="!isProfileLoading && operatorProfile && operatorProfile.isApproved">
+    <!-- Loading spinner -->
+    <div *ngIf="isLoading" class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading dashboard…</span>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+      {{ errorMessage }}
+    </div>
+
+    <!-- Bus Status Management -->
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header fw-semibold">
+        Bus Management
+        <span class="badge bg-secondary ms-2">{{ buses.length }}</span>
+      </div>
+      <div class="card-body p-0">
+        <div *ngIf="buses.length === 0" class="text-center text-muted py-4">
+          No buses registered yet.
+        </div>
+        <div *ngIf="buses.length > 0" class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th scope="col">Bus Name</th>
+                <th scope="col">Route</th>
+                <th scope="col">Status</th>
+                <th scope="col" class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let bus of buses">
+                <td class="fw-semibold">{{ bus.busName ?? bus.busNumber ?? bus.id }}</td>
+                <td>{{ bus.sourceCity }} → {{ bus.destinationCity }}</td>
+                <td>
+                  <span class="badge" [class]="getBusStatusBadgeClass(bus.status)">
+                    {{ bus.status }}
+                  </span>
+                </td>
+                <td class="text-end">
+                  <button 
+                    *ngIf="bus.status === 'ACTIVE'"
+                    class="btn btn-sm btn-outline-secondary me-2"
+                    (click)="disableBus(bus.id)"
+                    [disabled]="isUpdatingBusStatus"
+                  >
+                    <i class="bi bi-pause-fill"></i> Disable
+                  </button>
+                  <button 
+                    *ngIf="bus.status === 'ACTIVE' || bus.status === 'DISABLED'"
+                    class="btn btn-sm btn-outline-danger"
+                    (click)="removeBus(bus.id)"
+                    [disabled]="isUpdatingBusStatus"
+                  >
+                    <i class="bi bi-trash"></i> Remove
+                  </button>
+                  <span *ngIf="bus.status === 'PENDING'" class="text-muted small">
+                    Pending approval
+                  </span>
+                  <span *ngIf="bus.status === 'REMOVED'" class="text-muted small">
+                    Already removed
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bus Filter -->
+    <div class="card mb-4 shadow-sm">
+      <div class="card-body">
+        <label for="busFilter" class="form-label fw-semibold">Filter Bookings by Bus</label>
+        <select
+          id="busFilter"
+          class="form-select"
+          style="max-width: 320px;"
+          [(ngModel)]="selectedBusId"
+          (ngModelChange)="onBusFilterChange()"
+        >
+          <option [ngValue]="null">All Buses</option>
+          <option *ngFor="let bus of buses" [value]="bus.id">
+            {{ bus.busName ?? bus.busNumber ?? bus.id }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Status Message -->
+    <div *ngIf="busStatusMessage" class="alert alert-info alert-dismissible fade show" role="alert">
+      {{ busStatusMessage }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Bookings Table -->
+    <div class="card shadow-sm">
+      <div class="card-header fw-semibold">
+        Bookings
+        <span class="badge bg-secondary ms-2">{{ filteredBookings.length }}</span>
+      </div>
+      <div class="card-body p-0">
+
+        <!-- Empty state -->
+        <div *ngIf="filteredBookings.length === 0" class="text-center text-muted py-5">
+          <p class="mb-0">No bookings found{{ selectedBusId ? ' for the selected bus' : '' }}.</p>
+        </div>
+
+        <!-- Table -->
+        <div *ngIf="filteredBookings.length > 0" class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th scope="col">PNR</th>
+                <th scope="col">Journey Date</th>
+                <th scope="col">Passengers & Seat Numbers</th>
+                <th scope="col">Status</th>
+                <th scope="col" class="text-end">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let booking of filteredBookings">
+                <td class="fw-semibold">{{ booking.pnr ?? '—' }}</td>
+                <td>{{ booking.journeyDate ?? '—' }}</td>
+                <td>
+                  <div class="small">
+                    <div class="text-muted">Passengers: {{ booking.seats?.length ?? booking.passengerCount ?? '—' }}</div>
+                    <div class="text-break" style="max-width: 300px;">
+                      <small class="text-muted">{{ getPassengerDetails(booking) }}</small>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge"
+                    [class.bg-success]="booking.status === 'CONFIRMED'"
+                    [class.bg-danger]="booking.status === 'CANCELLED'"
+                    [class.bg-warning]="booking.status === 'PAYMENT_PENDING'"
+                    [class.bg-info]="booking.status === 'REFUNDED'"
+                    [class.bg-secondary]="!booking.status || booking.status === 'INITIATED'"
+                  >
+                    {{ booking.status ?? 'UNKNOWN' }}
+                  </span>
+                </td>
+                <td class="text-end">
+                  <span *ngIf="booking.totalAmount != null">₹{{ booking.totalAmount | number:'1.2-2' }}</span>
+                  <span *ngIf="booking.totalAmount == null" class="text-muted">—</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+
+  </ng-container>
+
+</div>

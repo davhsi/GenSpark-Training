@@ -1,0 +1,101 @@
+<div class="operating-days-section">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h6 class="mb-0">
+      <i class="bi bi-calendar-week me-2"></i>
+      Operating Days
+      <span class="badge bg-secondary ms-2">{{ getActiveDaysCount() }}/7 days</span>
+    </h6>
+    <button 
+      *ngIf="!isEditing" 
+      class="btn btn-sm btn-outline-primary"
+      (click)="startEditing()">
+      <i class="bi bi-pencil me-1"></i>
+      Edit Days
+    </button>
+  </div>
+
+  <!-- Display Mode -->
+  <div *ngIf="!isEditing" class="row g-2">
+    <div 
+      *ngFor="let day of dayNames" 
+      class="col-auto">
+      <span 
+        class="badge"
+        [class]="getDayBadgeClass(day.value)">
+        {{ day.name.substring(0, 3) }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Edit Mode -->
+  <div *ngIf="isEditing" class="border rounded p-3 bg-light">
+    <!-- Error Message -->
+    <div *ngIf="errorMessage" class="alert alert-danger alert-sm mb-3">
+      {{ errorMessage }}
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="d-flex gap-2 mb-3">
+      <button 
+        type="button" 
+        class="btn btn-sm btn-outline-success"
+        (click)="selectAllDays()">
+        <i class="bi bi-check-all me-1"></i>
+        Select All
+      </button>
+      <button 
+        type="button" 
+        class="btn btn-sm btn-outline-secondary"
+        (click)="deselectAllDays()">
+        <i class="bi bi-x-square me-1"></i>
+        Deselect All
+      </button>
+      <span class="ms-auto text-muted small">
+        {{ getEditingActiveDaysCount() }} days selected
+      </span>
+    </div>
+
+    <!-- Day Selection Grid -->
+    <div class="row g-2 mb-3">
+      <div 
+        *ngFor="let day of dayNames" 
+        class="col-auto">
+        <label class="form-check form-switch">
+          <input 
+            type="checkbox" 
+            class="form-check-input"
+            [checked]="isEditingDayActive(day.value)"
+            (change)="toggleDay(day.value)">
+          <span class="form-check-label">
+            {{ day.name }}
+          </span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-flex gap-2">
+      <button 
+        type="button" 
+        class="btn btn-sm btn-primary"
+        (click)="saveOperatingDays()"
+        [disabled]="isSaving || getEditingActiveDaysCount() === 0">
+        <i class="bi bi-check-lg me-1"></i>
+        {{ isSaving ? 'Saving...' : 'Save Changes' }}
+      </button>
+      <button 
+        type="button" 
+        class="btn btn-sm btn-outline-secondary"
+        (click)="cancelEditing()"
+        [disabled]="isSaving">
+        <i class="bi bi-x-lg me-1"></i>
+        Cancel
+      </button>
+    </div>
+
+    <div *ngIf="getEditingActiveDaysCount() === 0" class="text-danger small mt-2">
+      <i class="bi bi-exclamation-triangle me-1"></i>
+      At least one day must be selected
+    </div>
+  </div>
+</div>

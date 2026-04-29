@@ -1,0 +1,179 @@
+.dialog-container {
+  min-width: 400px;
+  max-width: 500px;
+  padding: 0;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.dialog-header {
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #fecaca;
+}
+
+.dialog-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #991b1b;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dialog-content {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.warning-icon {
+  margin-bottom: 20px;
+  opacity: 0.9;
+}
+
+.message-content {
+  width: 100%;
+}
+
+.main-message {
+  font-size: 16px;
+  font-weight: 500;
+  color: #374151;
+  margin: 0 0 20px 0;
+  line-height: 1.5;
+}
+
+.refund-info {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+}
+
+.refund-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.refund-row:last-child {
+  margin-bottom: 0;
+}
+
+.refund-label {
+  font-size: 14px;
+  color: #374151;
+  font-weight: 500;
+}
+
+.refund-amount {
+  font-size: 18px;
+  font-weight: 700;
+  color: #059669;
+}
+
+.refund-percentage {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.percentage-badge {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 12px;
+  display: inline-block;
+  box-shadow: 0 2px 4px rgba(5, 150, 105, 0.2);
+}
+
+.warning-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #d97706;
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: 16px;
+}
+
+.dialog-actions {
+  padding: 16px 24px 24px;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  background: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+}
+
+.cancel-btn {
+  color: #6b7280 !important;
+  background: white !important;
+  border: 1px solid #d1d5db !important;
+  padding: 8px 16px !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+}
+
+.cancel-btn:hover {
+  background: #f3f4f6 !important;
+  border-color: #9ca3af !important;
+}
+
+.confirm-btn {
+  background: #dc2626 !important;
+  color: white !important;
+  padding: 8px 20px !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease !important;
+}
+
+.confirm-btn:hover {
+  background: #b91c1c !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+/* Animation for dialog entrance */
+.mat-dialog-container {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+  .dialog-container {
+    min-width: auto;
+    width: 90vw;
+    max-width: 400px;
+  }
+  
+  .dialog-actions {
+    flex-direction: column-reverse;
+  }
+  
+  .cancel-btn,
+  .confirm-btn {
+    width: 100%;
+  }
+}

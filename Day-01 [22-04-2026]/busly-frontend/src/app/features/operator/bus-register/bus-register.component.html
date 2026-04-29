@@ -1,0 +1,142 @@
+<div class="container" style="max-width: 640px;">
+  <h3 class="fw-bold mb-4">Register New Bus</h3>
+
+  <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+        <!-- Bus Number -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Bus Number</label>
+          <input
+            type="text"
+            class="form-control"
+            [class.is-invalid]="isInvalid('busNumber')"
+            formControlName="busNumber"
+            placeholder="e.g. KA-01-AB-1234"
+          />
+          <div class="invalid-feedback">Bus number is required.</div>
+        </div>
+
+        <!-- Bus Name -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Bus Name</label>
+          <input
+            type="text"
+            class="form-control"
+            [class.is-invalid]="isInvalid('busName')"
+            formControlName="busName"
+            placeholder="e.g. Express Travels"
+          />
+          <div class="invalid-feedback">Bus name is required.</div>
+        </div>
+
+        <!-- Owner Name -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Owner Name</label>
+          <input
+            type="text"
+            class="form-control"
+            [class.is-invalid]="isInvalid('ownerName')"
+            formControlName="ownerName"
+            placeholder="e.g. John Doe"
+          />
+          <div class="invalid-feedback">Owner name is required.</div>
+        </div>
+
+        <div class="row">
+          <!-- Driver Details -->
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold text-primary">Driver Name</label>
+            <input type="text" class="form-control" formControlName="driverName" placeholder="Driver name" />
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold text-primary">Driver Phone</label>
+            <input type="tel" class="form-control" formControlName="driverPhone" placeholder="Driver phone" />
+          </div>
+        </div>
+
+        <div class="row">
+          <!-- Conductor Details -->
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold text-success">Conductor Name</label>
+            <input type="text" class="form-control" formControlName="conductorName" placeholder="Conductor name" />
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold text-success">Conductor Phone</label>
+            <input type="tel" class="form-control" formControlName="conductorPhone" placeholder="Conductor phone" />
+          </div>
+        </div>
+
+        <!-- Base Price -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Base Price (USD)</label>
+          <input
+            type="number"
+            class="form-control"
+            [class.is-invalid]="isInvalid('basePrice')"
+            formControlName="basePrice"
+            placeholder="e.g. 25.00"
+            min="0"
+            step="0.01"
+          />
+          <div class="invalid-feedback">A valid base price is required.</div>
+        </div>
+
+        <!-- Route -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Route</label>
+          <select
+            class="form-select"
+            [class.is-invalid]="isInvalid('routeId')"
+            formControlName="routeId"
+          >
+            <option value="">-- Select a route --</option>
+            <option *ngFor="let route of routes" [value]="route.id">
+              {{ route.sourceCity }} → {{ route.destinationCity }}
+            </option>
+          </select>
+          <div class="invalid-feedback">Please select a route.</div>
+        </div>
+
+        <!-- Layout -->
+        <div class="mb-4">
+          <label class="form-label fw-semibold">Seat Layout</label>
+          <select
+            class="form-select"
+            [class.is-invalid]="isInvalid('layoutId')"
+            formControlName="layoutId"
+          >
+            <option value="">-- Select a layout --</option>
+            <option *ngFor="let layout of layouts" [value]="layout.id">
+              {{ layout.layoutName }} ({{ layout.totalSeats }} seats)
+            </option>
+          </select>
+          <div class="invalid-feedback">Please select a seat layout.</div>
+          
+          <!-- Show create layout button when no layouts exist -->
+          <div *ngIf="layouts.length === 0" class="mt-2">
+            <small class="text-muted d-block mb-2">No seat layouts found. Create one first.</small>
+            <button 
+              type="button" 
+              class="btn btn-outline-success btn-sm"
+              (click)="goToCreateLayout()"
+            >
+              <i class="bi bi-plus-circle me-1"></i>Create New Layout
+            </button>
+          </div>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary" [disabled]="isSubmitting">
+            {{ isSubmitting ? 'Registering...' : 'Register Bus' }}
+          </button>
+          <a routerLink="/operator/buses" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>

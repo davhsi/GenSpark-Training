@@ -1,0 +1,190 @@
+<div class="container-fluid p-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="h4 mb-0 fw-bold">Terms & Conditions Management</h2>
+  </div>
+
+  <!-- Tab Navigation -->
+  <ul class="nav nav-tabs mb-4" id="tcTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="publish-tab" data-bs-toggle="tab" data-bs-target="#publish" type="button" role="tab" 
+              (click)="activeTab = 'publish'">
+        <i class="bi bi-pencil-square me-2"></i>Publish New Version
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button" role="tab"
+              (click)="activeTab = 'history'">
+        <i class="bi bi-clock-history me-2"></i>Version History
+        <span class="badge bg-secondary ms-2">{{ versions.length }}</span>
+      </button>
+    </li>
+  </ul>
+
+  <!-- Tab Content -->
+  <div class="tab-content" id="tcTabsContent">
+    <!-- Publish New Version Tab -->
+    <div class="tab-pane fade show active" id="publish" role="tabpanel">
+      <div class="row">
+        <div class="col-lg-4">
+          <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+              <h5 class="card-title fw-bold mb-4">Version Details</h5>
+              <form (ngSubmit)="publishTc()" #tcForm="ngForm">
+                <div class="mb-3">
+                  <label class="form-label text-muted small fw-bold">Version (Auto-incremented)</label>
+                  <input type="text" name="version" class="form-control" placeholder="e.g. v1.1, v1.2" 
+                         [(ngModel)]="newTc.version" required #v="ngModel" readonly>
+                  <div class="form-text text-muted small">Version will be auto-incremented based on latest version</div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label text-muted small fw-bold">Effective Date</label>
+                  <input type="datetime-local" name="effectiveDate" class="form-control" 
+                         [(ngModel)]="newTc.effectiveAt" #e="ngModel">
+                  <div class="form-text text-muted small">When this T&C becomes effective (optional, defaults to publish time)</div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-bold" 
+                        [disabled]="tcForm.invalid || submitting">
+                  <span *ngIf="!submitting">Publish & Activate</span>
+                  <span *ngIf="submitting">Publishing...</span>
+                </button>
+              </form>
+              <div class="alert alert-warning mt-3 mb-0 small">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                Publishing a new version will force all users to re-accept the terms.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-8">
+          <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="card-title fw-bold mb-0">Content (Markdown supported)</h5>
+                <div class="btn-group btn-group-sm" role="group">
+                  <button type="button" class="btn btn-outline-secondary" 
+                          [class.active]="!isPreviewMode" 
+                          (click)="isPreviewMode = false">
+                    <i class="bi bi-pencil-square me-1"></i>Edit
+                  </button>
+                  <button type="button" class="btn btn-outline-secondary" 
+                          [class.active]="isPreviewMode" 
+                          (click)="togglePreview()">
+                    <i class="bi bi-eye me-1"></i>Preview
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Edit Mode -->
+              <div *ngIf="!isPreviewMode">
+                <textarea name="content" class="form-control" style="min-height: 500px;" placeholder="Enter full T&C content here..."
+                          [(ngModel)]="newTc.content" required #c="ngModel" 
+                          (input)="onContentChange()"></textarea>
+                <div *ngIf="c.invalid && (c.dirty || c.touched)" class="text-danger small mt-1">Content is required</div>
+              </div>
+              
+              <!-- Preview Mode -->
+              <div *ngIf="isPreviewMode" class="border rounded p-4 bg-light" style="min-height: 500px; max-height: 70vh; overflow-y: auto;">
+                <div *ngIf="!previewContent" class="text-muted text-center py-5">
+                  <i class="bi bi-eye-slash me-2"></i>
+                  No content to preview. Start typing in edit mode.
+                </div>
+                <div *ngIf="previewContent" [innerHTML]="previewContent" class="markdown-preview"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Version History Tab -->
+    <div class="tab-pane fade" id="history" role="tabpanel">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+          <div class="p-4 border-bottom">
+            <h5 class="card-title fw-bold mb-0">Version History</h5>
+          </div>
+          
+          <div *ngIf="loading" class="text-center p-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2 text-muted">Loading versions...</p>
+          </div>
+
+          <div *ngIf="!loading && versions.length === 0" class="text-center p-5">
+            <p class="text-muted mb-0">No T&C versions found.</p>
+          </div>
+
+          <div class="table-responsive" *ngIf="!loading && versions.length > 0">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="bg-light">
+                <tr>
+                  <th class="px-4 py-3 text-muted small fw-bold">Version</th>
+                  <th class="py-3 text-muted small fw-bold">Published Date</th>
+                  <th class="py-3 text-muted small fw-bold">Effective Date</th>
+                  <th class="py-3 text-muted small fw-bold">Status</th>
+                  <th class="px-4 py-3 text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let v of versions">
+                  <td class="px-4 fw-medium">{{ v.version }}</td>
+                  <td>{{ v.publishedAt | date:'medium' }}</td>
+                  <td>{{ v.effectiveAt ? (v.effectiveAt | date:'medium') : 'Immediately' }}</td>
+                  <td>
+                    <span class="badge" [class.bg-success]="v.isActive" [class.bg-light]="!v.isActive" [class.text-dark]="!v.isActive">
+                      {{ v.isActive ? 'Active' : 'Archived' }}
+                    </span>
+                  </td>
+                  <td class="px-4 text-end">
+                    <button class="btn btn-sm btn-outline-info me-1" (click)="previewVersion(v)" title="Preview content">
+                      <i class="bi bi-eye"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary" (click)="cloneVersion(v)" title="Clone version">
+                      <i class="bi bi-copy"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Preview Modal -->
+<div class="modal fade show d-block" tabindex="-1" *ngIf="showPreviewModal" style="background-color: rgba(0, 0, 0, 0.5);">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" [class.modal-fullscreen]="isFullscreen">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Preview: {{ previewingVersion?.version }}</h5>
+        <div>
+          <button type="button" class="btn btn-sm btn-outline-secondary me-2" (click)="toggleFullscreen()" title="Toggle fullscreen">
+            <i class="bi bi-fullscreen"></i>
+          </button>
+          <button type="button" class="btn-close" (click)="closePreview()"></button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <small class="text-muted">
+            Published: {{ previewingVersion?.publishedAt | date:'medium' }} | 
+            Effective: {{ previewingVersion?.effectiveAt ? (previewingVersion?.effectiveAt | date:'medium') : 'Immediately' }}
+          </small>
+        </div>
+        <div class="border rounded p-4" style="max-height: 70vh; overflow-y: auto; background-color: #ffffff;">
+          <div [innerHTML]="previewContent" class="markdown-preview"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="d-flex justify-content-between w-100">
+          <small class="text-muted align-self-center">
+            <i class="bi bi-info-circle me-1"></i>
+            Scroll to view full content • Use ESC to close
+          </small>
+          <button type="button" class="btn btn-secondary" (click)="closePreview()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

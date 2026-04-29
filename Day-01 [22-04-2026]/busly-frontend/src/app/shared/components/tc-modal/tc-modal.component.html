@@ -1,0 +1,79 @@
+<!-- Modal backdrop -->
+<div
+  class="modal d-block"
+  tabindex="-1"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="tcModalTitle"
+  style="background-color: rgba(0, 0, 0, 0.5);"
+>
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+
+      <!-- Header -->
+      <div class="modal-header">
+        <h5 class="modal-title" id="tcModalTitle">Terms &amp; Conditions</h5>
+      </div>
+
+      <!-- User T&C Status -->
+      <div class="alert alert-info m-3" *ngIf="!loading && tcStatus">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <strong>Your T&C Status:</strong>
+            <div class="small mt-1" *ngIf="tcStatus.lastAcceptedVersion">
+              Last accepted: <span class="badge bg-secondary">{{ tcStatus.lastAcceptedVersion }}</span>
+              <span class="text-muted ms-2">{{ tcStatus.lastAcceptedAt | date:'medium' }}</span>
+            </div>
+            <div class="small mt-1" *ngIf="!tcStatus.hasAcceptedTc">
+              <span class="text-warning">You haven't accepted any T&C version yet</span>
+            </div>
+            <div class="small mt-1" *ngIf="tcStatus.needsToAcceptCurrent">
+              <span class="text-danger">New version available - please accept to continue</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body">
+        <div *ngIf="loading" class="text-center py-3">
+          <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+          Loading T&C status...
+        </div>
+        
+        <div *ngIf="errorMessage" class="alert alert-danger mb-3" role="alert">
+          {{ errorMessage }}
+        </div>
+        
+        <pre class="text-wrap" style="white-space: pre-wrap; font-family: inherit;">{{ content }}</pre>
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-outline-secondary"
+          (click)="onDecline()"
+          [disabled]="isAccepting"
+        >
+          Decline
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="onAccept()"
+          [disabled]="isAccepting"
+        >
+          <span
+            *ngIf="isAccepting"
+            class="spinner-border spinner-border-sm me-2"
+            role="status"
+            aria-hidden="true"
+          ></span>
+          {{ isAccepting ? 'Accepting…' : 'Accept' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

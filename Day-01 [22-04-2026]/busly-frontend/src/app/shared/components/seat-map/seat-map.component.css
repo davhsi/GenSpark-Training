@@ -1,0 +1,91 @@
+.seat {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  user-select: none;
+}
+
+.seat:hover {
+  transform: scale(1.08);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.seat-available {
+  background-color: #ffffff;
+  border-color: #495057;
+  color: #212529;
+}
+
+.seat-male {
+  background-color: #0d6efd;
+  border-color: #0a58ca;
+  color: #ffffff;
+  cursor: not-allowed;
+}
+
+.seat-female {
+  background-color: #e83e8c;
+  border-color: #c2185b;
+  color: #ffffff;
+  cursor: not-allowed;
+}
+
+.seat-locked {
+  background-color: #adb5bd;
+  border-color: #6c757d;
+  color: #495057;
+  cursor: not-allowed;
+}
+
+.seat-selected {
+  background-color: #fff3cd;
+  border-color: #ffc107;
+  color: #212529;
+  box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.4);
+}
+
+.aisle {
+  width: 24px;
+  display: inline-block;
+}
+
+.deck-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6c757d;
+  margin-bottom: 0.5rem;
+}
+
+.seat-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.countdown-badge {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #dc3545;
+  font-family: 'Courier New', monospace;
+}
+
+.countdown-display {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.seat-map-container {
+  position: relative;
+}

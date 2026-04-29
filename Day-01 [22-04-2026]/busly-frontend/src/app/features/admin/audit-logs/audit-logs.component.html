@@ -1,0 +1,107 @@
+<div class="animate-fade-up">
+
+  <!-- Page Header -->
+  <div class="d-flex justify-content-between align-items-start mb-5">
+    <div>
+      <h2 class="display-heading mb-1" style="font-size: 1.75rem;">System Audit Logs</h2>
+      <p style="color: var(--slate); font-size: 0.9rem; margin: 0;">Track all platform actions and events.</p>
+    </div>
+    <button class="btn btn-outline-secondary btn-sm" (click)="loadLogs()">
+      <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+    </button>
+  </div>
+
+  <!-- Search & Filter -->
+  <div class="card mb-4">
+    <div class="card-body p-3">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <div class="input-group">
+            <span class="input-group-text" style="border-right: none !important;">
+              <i class="bi bi-search"></i>
+            </span>
+            <input
+              type="text"
+              class="form-control"
+              style="border-left: none !important;"
+              placeholder="Search by action, role, or entity…"
+              [(ngModel)]="searchTerm"
+              (ngModelChange)="applyFilter()"
+            />
+          </div>
+        </div>
+        <div class="col-md-6 text-md-end mt-2 mt-md-0">
+          <span style="color: var(--slate); font-size: 0.8rem;">
+            Showing <strong style="color: var(--white);">{{ filteredLogs.length }}</strong> of {{ logs.length }} records
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger mb-4">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ errorMessage }}
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="text-center py-5">
+    <div class="spinner-border" role="status" style="width: 2.5rem; height: 2.5rem;"></div>
+    <p style="color: var(--slate); margin-top: 1rem; font-size: 0.9rem;">Fetching system logs…</p>
+  </div>
+
+  <!-- Table -->
+  <div *ngIf="!isLoading" class="card">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Timestamp</th>
+              <th>Actor</th>
+              <th>Action</th>
+              <th>Entity</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let log of filteredLogs">
+              <td class="text-nowrap">
+                <div class="fw-medium" style="font-size: 0.875rem;">{{ log.timestamp | date:'shortDate' }}</div>
+                <div style="color: var(--slate); font-size: 0.75rem;">{{ log.timestamp | date:'shortTime' }}</div>
+              </td>
+              <td>
+                <span class="badge"
+                  [class.bg-primary]="log.actorRole === 'admin'"
+                  [class.bg-info]="log.actorRole === 'operator'"
+                  [class.bg-secondary]="log.actorRole === 'customer'">
+                  {{ log.actorRole | uppercase }}
+                </span>
+                <div style="color: var(--slate); font-size: 0.75rem; margin-top: 0.25rem;">{{ log.actorId | slice:0:8 }}…</div>
+              </td>
+              <td>
+                <span class="fw-semibold" style="font-size: 0.875rem;">{{ log.action }}</span>
+              </td>
+              <td>
+                <div class="fw-medium" style="font-size: 0.875rem;">{{ log.entityType }}</div>
+                <div style="color: var(--slate); font-size: 0.75rem;" *ngIf="log.entityId">{{ log.entityId | slice:0:8 }}…</div>
+              </td>
+              <td>
+                <div *ngIf="log.metadata" style="font-size: 0.75rem; color: var(--slate);">
+                  <pre style="margin: 0; font-family: var(--font-ui); white-space: pre-wrap; word-break: break-all;" *ngIf="isJson(formatMetadata(log.metadata))">{{ formatMetadata(log.metadata) | json }}</pre>
+                  <span *ngIf="!isJson(formatMetadata(log.metadata))">{{ log.metadata }}</span>
+                </div>
+                <span *ngIf="!log.metadata" style="color: var(--slate-dim);">—</span>
+              </td>
+            </tr>
+            <tr *ngIf="filteredLogs.length === 0">
+              <td colspan="5" class="text-center py-5" style="color: var(--slate);">
+                No audit logs found matching your search.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>

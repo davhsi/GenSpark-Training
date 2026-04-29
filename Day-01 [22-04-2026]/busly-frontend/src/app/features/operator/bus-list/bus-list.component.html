@@ -1,0 +1,266 @@
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold mb-0">My Buses</h3>
+    <a routerLink="/operator/buses/register" class="btn btn-primary" *ngIf="operatorProfile?.isApproved">
+      + Register Bus
+    </a>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading buses…</span>
+    </div>
+  </div>
+
+  <!-- Error/Approval Status Messages -->
+  <div *ngIf="!isLoading && errorMessage" class="alert" [class.alert-danger]="!operatorProfile || operatorProfile.isApproved" [class.alert-warning]="operatorProfile && !operatorProfile.isApproved">
+    <div *ngIf="operatorProfile && !operatorProfile.isApproved" class="d-flex align-items-center">
+      <div class="me-3">
+        <div class="spinner-border text-warning me-2" role="status" *ngIf="operatorProfile.isPending">
+          <span class="visually-hidden">Loading…</span>
+        </div>
+        <i class="bi bi-exclamation-triangle-fill me-2" *ngIf="operatorProfile.isRejected || operatorProfile.isDisabled"></i>
+      </div>
+      <div>
+        <h6 class="alert-heading mb-1" *ngIf="operatorProfile.isPending">Account Pending Approval</h6>
+        <h6 class="alert-heading mb-1" *ngIf="operatorProfile.isRejected">Account Rejected</h6>
+        <h6 class="alert-heading mb-1" *ngIf="operatorProfile.isDisabled">Account Disabled</h6>
+        <p class="mb-0">{{ errorMessage }}</p>
+      </div>
+    </div>
+    <div *ngIf="!operatorProfile || operatorProfile.isApproved">
+      {{ errorMessage }}
+    </div>
+  </div>
+
+  <!-- Bus Table (only show for approved operators) -->
+  <div *ngIf="!isLoading && !errorMessage && operatorProfile?.isApproved" class="card shadow-sm">
+    <div class="card-body p-0">
+      <table class="table table-hover mb-0">
+        <thead class="table-dark">
+          <tr>
+            <th>Bus Name</th>
+            <th>Bus Number</th>
+            <th>Route</th>
+            <th>Owner</th>
+            <th>Status</th>
+            <th>Base Price</th>
+            <th>Operating Days</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let bus of buses">
+            <td class="align-middle">{{ bus.busName }}</td>
+            <td class="align-middle">{{ bus.busNumber }}</td>
+            <td class="align-middle">
+              <span class="small fw-medium">{{ bus.sourceCity }}</span>
+              <span class="mx-2 text-muted">→</span>
+              <span class="small fw-medium">{{ bus.destinationCity }}</span>
+            </td>
+            <td class="align-middle">{{ bus.ownerName }}</td>
+            <td class="align-middle">
+              <span class="badge {{ statusBadgeClass(bus.status) }}">
+                {{ bus.status }}
+              </span>
+            </td>
+            <td class="align-middle">₹{{ bus.basePrice | number:'1.0-2' }}</td>
+            <td class="align-middle">
+              <div class="d-flex flex-wrap gap-1">
+                <span 
+                  *ngFor="let day of [1,2,3,4,5,6,7]" 
+                  class="badge"
+                  [class]="getDayBadgeClass(bus, day)"
+                  style="font-size: 0.7rem;">
+                  {{ ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][day-1] }}
+                </span>
+              </div>
+            </td>
+            <td class="align-middle">
+              <div class="dropdown" *ngIf="canActOnBus(bus.status)">
+                <button
+                  class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                  type="button"
+                  [attr.data-bs-toggle]="'dropdown'"
+                  aria-expanded="false"
+                >
+                  Actions
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                  <li>
+                    <button class="dropdown-item" (click)="editPrice(bus)">
+                      <i class="bi bi-tag me-2 text-success"></i>Update Price
+                    </button>
+                  </li>
+                  <li>
+                    <button class="dropdown-item" (click)="showOperatingDaysModal(bus)">
+                      <i class="bi bi-calendar-week me-2 text-primary"></i>Operating Days
+                    </button>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" [routerLink]="['/operator/buses', bus.id, 'stops']">
+                      <i class="bi bi-geo-alt me-2 text-secondary"></i>Manage Stops
+                    </a>
+                  </li>
+                  <li>
+                    <button class="dropdown-item" (click)="editStaff(bus)">
+                      <i class="bi bi-people me-2 text-info"></i>Manage Staff
+                    </button>
+                  </li>
+                  <li *ngIf="bus.status?.toUpperCase() === 'ACTIVE'">
+                    <hr class="dropdown-divider">
+                  </li>
+                  <li *ngIf="bus.status?.toUpperCase() === 'ACTIVE'">
+                    <button class="dropdown-item text-warning" (click)="disable(bus.id)">
+                      <i class="bi bi-pause-circle me-2"></i>Disable Bus
+                    </button>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li>
+                    <button class="dropdown-item text-danger" (click)="remove(bus.id)">
+                      <i class="bi bi-trash me-2"></i>Remove Bus
+                    </button>
+                  </li>
+                </ul>
+              </div>
+              <span *ngIf="!canActOnBus(bus.status)" class="text-muted small">—</span>
+            </td>
+          </tr>
+          <tr *ngIf="buses.length === 0">
+            <td colspan="8" class="text-center text-muted py-4">
+              No buses registered yet.
+              <a routerLink="/operator/buses/register">Register your first bus.</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Price Update Modal -->
+<div class="modal fade show d-block" *ngIf="isPriceModalOpen" style="background: rgba(0,0,0,0.5); position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1055; overflow-y: auto;">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 420px; margin: 1.75rem auto;">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header border-0" style="background: var(--blue); color: white;">
+        <h5 class="modal-title fw-bold">
+          <i class="bi bi-tag me-2"></i>Update Base Price
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closePriceModal()"></button>
+      </div>
+      <div class="modal-body p-4">
+        <p class="text-muted small mb-3">
+          Bus: <strong>{{ selectedBusForPrice?.busName }}</strong>
+          &nbsp;·&nbsp;
+          Current: <strong>₹{{ selectedBusForPrice?.basePrice | number:'1.0-2' }}</strong>
+        </p>
+        <form [formGroup]="priceForm" (ngSubmit)="savePrice()">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">New Base Price (₹)</label>
+            <div class="input-group">
+              <span class="input-group-text">₹</span>
+              <input
+                type="number"
+                class="form-control"
+                formControlName="basePrice"
+                placeholder="e.g. 1000"
+                min="1"
+                step="0.01"
+                [class.is-invalid]="priceForm.get('basePrice')?.invalid && priceForm.get('basePrice')?.touched"
+              />
+              <div class="invalid-feedback">Enter a valid price (minimum ₹1).</div>
+            </div>
+          </div>
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary fw-semibold" [disabled]="isSavingPrice || priceForm.invalid">
+              {{ isSavingPrice ? 'Saving...' : 'Update Price' }}
+            </button>
+            <button type="button" class="btn btn-link text-muted btn-sm" (click)="closePriceModal()">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Staff Management Modal -->
+<div class="modal fade show d-block" *ngIf="isStaffModalOpen" style="background: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header bg-dark text-white border-0">
+        <h5 class="modal-title fw-bold">Manage Crew Details</h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeStaffModal()"></button>
+      </div>
+      <div class="modal-body p-4 bg-light">
+        <form [formGroup]="staffForm" (ngSubmit)="saveStaff()">
+          
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-3">
+              <h6 class="text-primary fw-bold mb-3 d-flex align-items-center">
+                <span class="me-2">👤</span> Driver Information
+              </h6>
+              <div class="row g-3">
+                <div class="col-12">
+                  <label class="form-label small fw-semibold text-muted mb-1">Full Name</label>
+                  <input type="text" class="form-control form-control-sm border-0 bg-light" formControlName="driverName" placeholder="e.g. John Doe">
+                </div>
+                <div class="col-12">
+                  <label class="form-label small fw-semibold text-muted mb-1">Phone Number</label>
+                  <input type="tel" class="form-control form-control-sm border-0 bg-light" formControlName="driverPhone" placeholder="e.g. +91 98765 43210">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-3">
+              <h6 class="text-success fw-bold mb-3 d-flex align-items-center">
+                <span class="me-2">🧢</span> Conductor Information
+              </h6>
+              <div class="row g-3">
+                <div class="col-12">
+                  <label class="form-label small fw-semibold text-muted mb-1">Full Name</label>
+                  <input type="text" class="form-control form-control-sm border-0 bg-light" formControlName="conductorName" placeholder="e.g. Jane Smith">
+                </div>
+                <div class="col-12">
+                  <label class="form-label small fw-semibold text-muted mb-1">Phone Number</label>
+                  <input type="tel" class="form-control form-control-sm border-0 bg-light" formControlName="conductorPhone" placeholder="e.g. +91 98765 43211">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary fw-bold" [disabled]="isSavingStaff">
+              {{ isSavingStaff ? 'Saving Changes...' : 'Save Updates' }}
+            </button>
+            <button type="button" class="btn btn-link text-muted btn-sm" (click)="closeStaffModal()">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Operating Days Management Modal -->
+<div class="modal fade show d-block" *ngIf="isOperatingDaysModalOpen" style="background: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header bg-primary text-white border-0">
+        <h5 class="modal-title fw-bold">
+          <i class="bi bi-calendar-week me-2"></i>
+          Manage Operating Days - {{ selectedBusForDays?.busName }}
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeOperatingDaysModal()"></button>
+      </div>
+      <div class="modal-body p-4">
+        <app-operating-days
+          [busId]="selectedBusForDays?.id || ''"
+          [operatingDays]="selectedBusForDays?.operatingDays || []"
+          (operatingDaysUpdated)="onOperatingDaysUpdated($event)">
+        </app-operating-days>
+      </div>
+    </div>
+  </div>
+</div>
