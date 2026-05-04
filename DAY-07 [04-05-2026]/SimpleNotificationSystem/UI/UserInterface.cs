@@ -57,8 +57,17 @@ namespace SimpleNotificationSystem.UI
             string firstName = Console.ReadLine() ?? "";
             Console.Write("Last Name: ");
             string lastName = Console.ReadLine() ?? "";
-            Console.Write("Email: ");
-            string email = Console.ReadLine() ?? "";
+
+            // validation for email
+            string email = "";
+            while (true)
+            {
+                Console.Write("Email: ");
+                email = Console.ReadLine() ?? "";
+                if (email.Contains("@") && email.Contains("."))
+                    break;
+                Console.WriteLine("Invalid email format. Please ensure it contains '@' and '.'.");
+            }
 
             Console.Write("Country Code (don't include +): ");
             string countryCode = Console.ReadLine() ?? "";
@@ -67,6 +76,7 @@ namespace SimpleNotificationSystem.UI
                 countryCode = "+" + countryCode;
             }
 
+            // validation for phone number
             string phoneNumber = "";
             while (true)
             {
