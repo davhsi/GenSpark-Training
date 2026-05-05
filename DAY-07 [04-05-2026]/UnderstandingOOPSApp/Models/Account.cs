@@ -8,12 +8,12 @@ namespace UnderstandingOOPSApp.Models
 {
     public enum AccType
     {
-        SavingAccount = 1, CurrentAccount = 2
+        SavingAccount =1,CurrentAccount=2
     }
-    internal class Account
+    internal partial class Account 
     {
-
-        public string AccountNumber { get; set; } = string.Empty;
+        
+        public  string AccountNumber { get; set; } =string.Empty;
         public string NameOnAccount { get; set; } = string.Empty;
         public DateTime DateOfBirth { get; set; }
         public string Email { get; set; } = string.Empty;
@@ -22,7 +22,7 @@ namespace UnderstandingOOPSApp.Models
         public AccType AccountType { get; set; }
         public Account()
         {
-
+            
         }
 
         public Account(string accountNumber, string nameOnAccount, DateTime dateOfBirth, string email, string phone, float balance)
@@ -34,10 +34,6 @@ namespace UnderstandingOOPSApp.Models
             Phone = phone;
             Balance = balance;
         }
-        public override string ToString()
-        {
-            return $"Account Number : {AccountNumber}\nAccountType : {AccountType}\nAccount Holder Name : {NameOnAccount}\nPhone Number : {Phone}\n" +
-                $"Email : {Email}\nBalance : ${Balance}";
-        }
+       
     }
 }

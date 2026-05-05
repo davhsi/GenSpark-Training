@@ -1,29 +1,35 @@
 using SimpleNotificationSystem.Models;
-using SimpleNotificationSystem.Interfaces;
-using System.Linq;
 
 namespace SimpleNotificationSystem.Services
 {
     internal class UserService
     {
-        public void AddUser(List<User> users, User user)
+        private List<User> _users = new List<User>();
+
+        public void AddUser(User user)
         {
-            users.Add(user);
+            _users.Add(user);
         }
 
-        public User? GetUserByEmail(List<User> users, string email)
+        public List<User> GetAllUsers()
         {
-            return users.Find(u => u.Email == email);
+            return _users;
         }
 
-        public User? GetUserByPhoneNumber(List<User> users, string phoneNumber)
+        public User? GetUserByEmail(string email)
         {
-            return users.Find(u => u.Phone.Number == phoneNumber);
+            return _users.Find(u => u.Email == email);
         }
 
-        public void DeleteUser(List<User> users, User user)
+        public bool DeleteUser(string email)
         {
-            users.Remove(user);
+            User? user = GetUserByEmail(email);
+            if (user != null)
+            {
+                _users.Remove(user);
+                return true;
+            }
+            return false;
         }
     }
 }

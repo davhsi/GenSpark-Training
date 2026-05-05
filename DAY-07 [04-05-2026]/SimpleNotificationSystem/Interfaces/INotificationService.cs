@@ -2,7 +2,7 @@ namespace SimpleNotificationSystem.Interfaces
 {
     internal interface INotificationService
     {
-       public void SendNotification(string contactInfo);
+       public void SendNotification(string contactInfo, string message);
        // both EmailNotificationService and EmailNotificationService must implement this method.
        // Future WhatsAppNotificationService also must implement it.
     }
