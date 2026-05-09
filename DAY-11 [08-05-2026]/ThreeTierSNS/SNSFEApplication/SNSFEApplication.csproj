@@ -1,7 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-      <ProjectReference Include="..\SNSBALLibrary\SNSBALLibrary.csproj" />
+    <ProjectReference Include="..\SNSBALLibrary\SNSBALLibrary.csproj" />
+    <ProjectReference Include="..\SNSDALLibrary\SNSDALLibrary.csproj" />
+    <ProjectReference Include="..\SNSModelLibrary\SNSModelLibrary.csproj" />
+
   </ItemGroup>
 
   <PropertyGroup>

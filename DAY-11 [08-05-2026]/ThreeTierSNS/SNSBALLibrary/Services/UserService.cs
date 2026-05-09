@@ -1,7 +1,7 @@
 using SNSModelLibrary;
 using SNSDALLibrary;
 
-namespace SNSBALLibrary
+namespace SNSBALLibrary.Services
 {
     public class UserService
     {
@@ -18,59 +18,36 @@ namespace SNSBALLibrary
             return _userRepository.Create(user);
         }
 
-        public List<User>? GetAllUsers()
+        public User GetUserByEmail(string email)
         {
-            var users = _userRepository.GetAccounts();
-            if (users != null)
-            {
-                users.Sort(); // Uses IComparable implementation
-            }
-            return users;
+            var user = _userRepository.GetByEmail(email);
+            if (user == null)
+                // throw a custom exception if the user is not found
+                throw new SNSModelLibrary.Exceptions.UserNotFoundException($"User '{email}' not found.");
+            return user;
         }
 
-        public User? GetUserByEmail(string email)
+        public List<User> GetAllUsers()
         {
-            return _userRepository.GetByEmail(email);
+            // using LINQ to order users by email in ascending order before returning the list
+            return _userRepository.GetAll().OrderBy(u => u.Email).ToList();
         }
 
-        public List<User>? GetUsersByFirstName(string firstName)
+        public bool UpdateUser(string email, string? fName, string? lName, string? phone)
         {
-            return _userRepository.GetByFirstName(firstName);
-        }
+            var user = _userRepository.GetByEmail(email);
+            if (user == null) return false;
+    
+            if (!string.IsNullOrEmpty(fName)) user.Name.FirstName = fName;
+            if (!string.IsNullOrEmpty(lName)) user.Name.LastName = lName;
+            if (!string.IsNullOrEmpty(phone)) user.Phone.Number = phone;
 
-        public bool UpdateUser(string email, string? newFirstName = null, string? newLastName = null, 
-                              string? newEmail = null, string? newPhoneNumber = null)
-        {
-            var existingUser = _userRepository.GetByEmail(email);
-            if (existingUser == null)
-                return false;
-
-            if (!string.IsNullOrEmpty(newFirstName))
-                existingUser.Name.FirstName = newFirstName;
-
-            if (!string.IsNullOrEmpty(newLastName))
-                existingUser.Name.LastName = newLastName;
-
-            if (!string.IsNullOrEmpty(newEmail))
-                existingUser.Email = newEmail;
-
-            if (!string.IsNullOrEmpty(newPhoneNumber))
-                existingUser.Phone.Number = newPhoneNumber;
-
-            // Note: In a real implementation with proper key management,
-            // we would call _userRepository.Update(key, user)
-            return true;
+            return _userRepository.Update(email, user);
         }
 
         public bool DeleteUser(string email)
         {
-            var user = _userRepository.GetByEmail(email);
-            if (user == null)
-                return false;
-
-            // Note: In a real implementation with proper key management,
-            // we would call _userRepository.Delete(key)
-            return true;
+            return _userRepository.Delete(email);
         }
     }
 }

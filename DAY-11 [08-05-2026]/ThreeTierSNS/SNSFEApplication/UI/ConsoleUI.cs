@@ -1,6 +1,7 @@
-using SNSModelLibrary;
-using SNSBALLibrary;
 using SNSDALLibrary;
+using SNSModelLibrary;
+using SNSBALLibrary.Services;
+using SNSModelLibrary.Exceptions;
 
 namespace SNSFEApplication.UI
 {
@@ -8,62 +9,30 @@ namespace SNSFEApplication.UI
     {
         private readonly UserService _userService;
         private readonly NotificationRepository _notificationRepository;
-        private readonly EmailNotificationService _emailService;
-        private readonly SMSNotificationService _smsService;
+        private readonly NotificationService _notificationService;
 
         public ConsoleUI()
         {
             _userService = new UserService(new UserRepository());
             _notificationRepository = new NotificationRepository();
-            _emailService = new EmailNotificationService();
-            _smsService = new SMSNotificationService();
+            _notificationService = new NotificationService(_notificationRepository);
         }
 
         public void Start()
         {
-            Console.WriteLine("=== 3Tier Simple Notification System ===");
-            Console.WriteLine("Welcome to the SNS Management System!");
+            Console.WriteLine("=== 3Tier Notification System ===");
 
             while (true)
             {
-                Console.WriteLine("\n--- Main Menu ---");
-                Console.WriteLine("1. User Management");
-                Console.WriteLine("2. Send Notification");
-                Console.WriteLine("3. Exit");
-                Console.Write("Enter your choice (1-3): ");
-
-                string choice = Console.ReadLine() ?? "";
-
-                switch (choice)
-                {
-                    case "1":
-                        UserManagementMenu();
-                        break;
-                    case "2":
-                        SendNotificationMenu();
-                        break;
-                    case "3":
-                        Console.WriteLine("Thank you for using SNS. Goodbye!");
-                        return;
-                    default:
-                        Console.WriteLine("Invalid choice. Please try again.");
-                        break;
-                }
-            }
-        }
-
-        private void UserManagementMenu()
-        {
-            while (true)
-            {
-                Console.WriteLine("\n---- User Management ----");
-                Console.WriteLine("1. Add New User");
+                Console.WriteLine("\n1. Add User");
                 Console.WriteLine("2. View All Users");
-                Console.WriteLine("3. Find User by Email");
-                Console.WriteLine("4. Update User");
-                Console.WriteLine("5. Delete User");
-                Console.WriteLine("6. Back to Main Menu");
-                Console.Write("Enter your choice (1-6): ");
+                Console.WriteLine("3. Update User");
+                Console.WriteLine("4. Delete User");
+                Console.WriteLine("5. Send Notification");
+                Console.WriteLine("6. Send Notification to Everyone");
+                Console.WriteLine("7. View Sent Notifications");
+                Console.WriteLine("8. Exit");
+                Console.Write("Select option: ");
 
                 string choice = Console.ReadLine() ?? "";
 
@@ -76,18 +45,24 @@ namespace SNSFEApplication.UI
                         ViewAllUsers();
                         break;
                     case "3":
-                        FindUserByEmail();
-                        break;
-                    case "4":
                         UpdateUser();
                         break;
-                    case "5":
+                    case "4":
                         DeleteUser();
                         break;
+                    case "5":
+                        SendNotification();
+                        break;
                     case "6":
+                        SendToEverryone();
+                        break;
+                    case "7":
+                        ViewNotifications();
+                        break;
+                    case "8":
                         return;
                     default:
-                        Console.WriteLine("Invalid choice. Please try again.");
+                        Console.WriteLine("Invalid choice.");
                         break;
                 }
             }
@@ -95,184 +70,136 @@ namespace SNSFEApplication.UI
 
         private void AddUser()
         {
-            Console.WriteLine("\n--- Add New User ---");
-            Console.Write("Enter First Name: ");
-            string firstName = Console.ReadLine() ?? "";
-            
-            Console.Write("Enter Last Name: ");
-            string lastName = Console.ReadLine() ?? "";
-            
-            Console.Write("Enter Email: ");
+            Console.Write("First Name: ");
+            string fName = Console.ReadLine() ?? "";
+            Console.Write("Last Name: ");
+            string lName = Console.ReadLine() ?? "";
+            Console.Write("Email: ");
             string email = Console.ReadLine() ?? "";
-            
-            Console.Write("Enter Country Code (e.g., +91): ");
-            string countryCode = Console.ReadLine() ?? "+91";
-            
-            Console.Write("Enter Phone Number: ");
-            string phoneNumber = Console.ReadLine() ?? "";
+            Console.Write("Country Code (e.g. +91): ");
+            string countryCode = Console.ReadLine() ?? "";
+            Console.Write("Phone: ");
+            string phone = Console.ReadLine() ?? "";
 
-            var user = _userService.AddUser(firstName, lastName, email, countryCode, phoneNumber);
-            
-            Console.WriteLine("User added successfully!");
-            Console.WriteLine(user.ToString());
+            _userService.AddUser(fName, lName, email, countryCode, phone);
+            Console.WriteLine($"User {fName} {lName} has been added successfully.");
         }
 
         private void ViewAllUsers()
         {
-            Console.WriteLine("\n--- All Users ---");
             var users = _userService.GetAllUsers();
-            
-            if (users == null || users.Count == 0)
-            {
-                Console.WriteLine("No users found.");
-                return;
-            }
-
-            for (int i = 0; i < users.Count; i++)
-            {
-                Console.WriteLine($"\n--- User {i + 1} ---");
-                Console.WriteLine(users[i].ToString());
-            }
-        }
-
-        private void FindUserByEmail()
-        {
-            Console.Write("\nEnter email to search: ");
-            string email = Console.ReadLine() ?? "";
-            
-            var user = _userService.GetUserByEmail(email);
-            if (user != null)
-            {
-                Console.WriteLine("User found:");
-                Console.WriteLine(user.ToString());
-            }
-            else
-            {
-                Console.WriteLine("User not found.");
-            }
+            if (users.Count == 0) Console.WriteLine("No users found. Try adding a user first.");
+            else users.ForEach(Console.WriteLine);
         }
 
         private void UpdateUser()
         {
-            Console.Write("\nEnter email of user to update: ");
+            Console.Write("Please enter Email to update: ");
             string email = Console.ReadLine() ?? "";
-            
-            var existingUser = _userService.GetUserByEmail(email);
-            if (existingUser == null)
+            Console.Write("New First Name (empty to skip): ");
+            string? fName = Console.ReadLine();
+            Console.Write("New Last Name (empty to skip): ");
+            string? lName = Console.ReadLine();
+            Console.Write("New Phone (empty to skip): ");
+            string? phone = Console.ReadLine();
+
+            if (_userService.UpdateUser(email, fName, lName, phone))
             {
-                Console.WriteLine("User not found.");
-                return;
-            }
-
-            Console.WriteLine("Current user details:");
-            Console.WriteLine(existingUser.ToString());
-
-            Console.Write("Enter new First Name (leave empty to keep current): ");
-            string? firstName = Console.ReadLine();
-
-            Console.Write("Enter new Last Name (leave empty to keep current): ");
-            string? lastName = Console.ReadLine();
-
-            Console.Write("Enter new Email (leave empty to keep current): ");
-            string? newEmail = Console.ReadLine();
-
-            Console.Write("Enter new Phone Number (leave empty to keep current): ");
-            string? phoneNumber = Console.ReadLine();
-
-            bool success = _userService.UpdateUser(email, firstName, lastName, newEmail, phoneNumber);
-            if (success)
-            {
-                var updatedUser = _userService.GetUserByEmail(newEmail ?? email);
-                Console.WriteLine("User updated successfully!");
-                Console.WriteLine(updatedUser?.ToString());
+                Console.WriteLine($"User {fName} {lName} has been updated successfully.");
             }
             else
             {
-                Console.WriteLine("Failed to update user.");
+                Console.WriteLine("Sorry, User not found.\nKindly ensure the email is correct and try again.");
             }
         }
 
         private void DeleteUser()
         {
-            Console.Write("\nEnter email of user to delete: ");
+            Console.Write("Email to delete: ");
             string email = Console.ReadLine() ?? "";
-            
-            var user = _userService.GetUserByEmail(email);
-            if (user == null)
+            if (_userService.DeleteUser(email))
             {
-                Console.WriteLine("User not found.");
-                return;
-            }
-
-            Console.WriteLine("User to delete:");
-            Console.WriteLine(user.ToString());
-
-            Console.Write("Are you sure you want to delete this user? (y/N): ");
-            string confirm = Console.ReadLine() ?? "";
-            
-            if (confirm.ToLower() == "y")
-            {
-                bool success = _userService.DeleteUser(email);
-                if (success)
-                {
-                    Console.WriteLine("User deleted successfully!");
-                }
-                else
-                {
-                    Console.WriteLine("Failed to delete user.");
-                }
+                Console.WriteLine("Deleted.");
             }
             else
             {
-                Console.WriteLine("Deletion cancelled.");
+                Console.WriteLine("Sorry, User not found.\nKindly ensure the email is correct and try again.");
             }
         }
 
-        private void SendNotificationMenu()
+        private void SendNotification()
         {
-            Console.WriteLine("\n--- Send Notification ---");
-            Console.Write("Enter recipient email: ");
+            Console.Write("Please enter Recipient Email: ");
             string email = Console.ReadLine() ?? "";
 
-            var user = _userService.GetUserByEmail(email);
-            if (user == null)
+            User user;
+            try
             {
-                Console.WriteLine("User not found.");
+                user = _userService.GetUserByEmail(email);
+            }
+            catch (UserNotFoundException)
+            {
+                Console.WriteLine("Sorry, User not found.\nKindly ensure the email is correct and try again.");
                 return;
             }
 
-            Console.Write("Enter message: ");
-            string message = Console.ReadLine() ?? "";
+            Console.Write("Message: ");
+            string msg = Console.ReadLine() ?? "";
 
-            Console.WriteLine("\nChoose notification method:");
-            Console.WriteLine("1. Email");
-            Console.WriteLine("2. SMS");
-            Console.Write("Enter choice (1-2): ");
-            string choice = Console.ReadLine() ?? "";
+            Console.WriteLine("Type:\n 1. Email\n2. SMS");
+            string typeChoice = Console.ReadLine() ?? "";
+            string type = typeChoice == "2" ? "SMS" : "Email";
 
-            bool success = false;
-            string notificationType = "";
-
-            switch (choice)
+            try
             {
-                case "1":
-                    success = _emailService.SendNotification(user, message);
-                    notificationType = "Email";
-                    break;
-                case "2":
-                    success = _smsService.SendNotification(user, message);
-                    notificationType = "SMS";
-                    break;
-                default:
-                    Console.WriteLine("Invalid choice.");
-                    return;
+                _notificationService.ProcessAndSendNotification(user, type, msg);
+                Console.WriteLine($"Notification sent successfully to {user.Email}.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Sorry, an error occurred: {ex.Message}");
+            }
+        }
+
+        private void ViewNotifications()
+        {
+            var notes = _notificationRepository.GetAll();
+            if (notes == null || notes.Count == 0)
+            {
+                Console.WriteLine("No notifications found.");
+                return;
             }
 
-            if (success)
+            foreach (var n in notes)
             {
-                var notification = new Notification(message ?? "No message", notificationType);
-                _notificationRepository.Create(notification);
-                Console.WriteLine("Notification saved to system.");
+                Console.WriteLine(n.ToString());
+            }
+        }
+
+        private void SendToEveryone()
+        {
+            var users = _userService.GetAllUsers();
+            if (users.Count == 0)
+            {
+                Console.WriteLine("No users found. Add some users first.");
+                return;
+            }
+
+            Console.Write("Message to all: ");
+            string msg = Console.ReadLine() ?? "";
+
+            Console.WriteLine("Type:\n 1. Email\n2. SMS");
+            string typeChoice = Console.ReadLine() ?? "";
+            string type = typeChoice == "2" ? "SMS" : "Email";
+
+            try
+            {
+                _notificationService.SendToAllNotifications(users, type, msg);
+                Console.WriteLine($"Notification sent successfully to {users.Count} users.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Sorry, an error occurred: {ex.Message}");
             }
         }
     }

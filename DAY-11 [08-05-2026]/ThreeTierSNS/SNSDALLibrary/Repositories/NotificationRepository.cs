@@ -2,30 +2,20 @@ using SNSModelLibrary;
 
 namespace SNSDALLibrary
 {
-    public class NotificationRepository : AbstractRepository<int, Notification>
+    public class NotificationRepository
     {
-        private int _nextId = 1;
-
-        public override Notification Create(Notification item)
+        
+        private readonly List<Notification> _notifications = new();
+    
+        public void Create(Notification notification)
         {
-            item.Id = _nextId++;
-            _items[item.Id] = item;
-            return item;
+            _notifications.Add(notification);
         }
 
-        public List<Notification>? GetByType(string type)
+        public List<Notification> GetAll()
         {
-            var notifications = _items.Values.Where(n => n.Type.Equals(type, StringComparison.OrdinalIgnoreCase)).ToList();
-            return notifications.Count > 0 ? notifications : null;
-        }
-
-        public List<Notification>? GetByDateRange(DateTime startDate, DateTime endDate)
-        {
-            var notifications = _items.Values
-                .Where(n => n.TimeStamp >= startDate && n.TimeStamp <= endDate)
-                .OrderByDescending(n => n.TimeStamp)
-                .ToList();
-            return notifications.Count > 0 ? notifications : null;
+            // using LINQ to order notifications by TimeStamp in descending order.
+            return _notifications.OrderByDescending(n => n.TimeStamp).ToList();
         }
     }
 }

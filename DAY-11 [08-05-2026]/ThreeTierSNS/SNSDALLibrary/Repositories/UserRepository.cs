@@ -2,26 +2,40 @@ using SNSModelLibrary;
 
 namespace SNSDALLibrary
 {
-    public class UserRepository : AbstractRepository<int, User>
+    public class UserRepository
     {
-        private int _nextId = 1;
+        private readonly Dictionary<string, User> _users = new();
 
-        public override User Create(User item)
+        public User Create(User user)
         {
-            var key = _nextId++;
-            _items[key] = item;
-            return item;
+            // using the indexer to add the user
+            _users[user.Email] = user;
+            return user;
         }
 
         public User? GetByEmail(string email)
         {
-            return _items.Values.FirstOrDefault(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+            // using TryGetValue to retrieve the user by email
+            _users.TryGetValue(email, out var user);
+            return user;
         }
 
-        public List<User>? GetByFirstName(string firstName)
+        public bool Update(string email, User updatedUser)
         {
-            var users = _items.Values.Where(u => u.Name.FirstName.Equals(firstName, StringComparison.OrdinalIgnoreCase)).ToList();
-            return users.Count > 0 ? users : null;
+            if (!_users.ContainsKey(email)) return false;
+            // using the indexer to update the user
+            _users[email] = updatedUser;
+            return true;
+        }
+
+        public bool Delete(string email)
+        {
+            return _users.Remove(email);
+        }
+
+        public List<User> GetAll()
+        {
+            return _users.Values.ToList();
         }
     }
 }
