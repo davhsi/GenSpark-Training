@@ -54,7 +54,7 @@ namespace SNSFEApplication.UI
                         SendNotification();
                         break;
                     case "6":
-                        SendToEverryone();
+                        SendToEveryone();
                         break;
                     case "7":
                         ViewNotifications();
