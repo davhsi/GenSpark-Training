@@ -1,0 +1,1 @@
+            "Host=localhost;Port=5432;Database=genspark_db;Username=davishe;Password=Laika#07@dav";
