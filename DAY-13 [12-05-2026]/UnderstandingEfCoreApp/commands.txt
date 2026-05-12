@@ -1,0 +1,5 @@
+dotnet add package Npgsql.EntityFrameworkCore.PostgreSQL --version 10.0.1
+dotnet add package Microsoft.EntityFrameworkCore.Tools --version 10.0.7
+dotnet add package Microsoft.EntityFrameworkCore.Design --version 10.0.7
+dotnet ef migrations add InitialCreate
+dotnet ef database update

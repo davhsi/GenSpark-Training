@@ -1,0 +1,14 @@
+The above is the app that we did for the game 
+Now shift the word, score and user details storage to database. The application need not be a multi tier application. Just separate the folders and files.
+Ensure the user logs in before starting the game. 
+We don't need the admin module to add words now. 
+Just player details and scores will do.
+
+
+Todo
+
+1. Create User Model - (PK) UserId (SERIAL), UserName, Password         - DONE
+2. Create Score Model - (PK) Id, Score, UserId (FK)                     - DONE
+3. Create Word Model - (PK) Id, word                                    - DONE
+4. Create 3 tables in pgAdmin                                           - DONE
+5. Add UserName already taken Exception                                
