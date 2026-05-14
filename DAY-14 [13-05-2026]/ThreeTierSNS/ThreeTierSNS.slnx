@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="SNSBALLibrary/SNSBALLibrary.csproj" />
+  <Project Path="SNSDALLibrary/SNSDALLibrary.csproj" />
+  <Project Path="SNSFEApplication/SNSFEApplication.csproj" />
+  <Project Path="SNSModelLibrary/SNSModelLibrary.csproj" />
+</Solution>
