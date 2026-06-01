@@ -1,0 +1,20 @@
+<h2>
+    <!-- interpolation -->
+    Welcome to the Customers Page, {{customerName}}!
+</h2>
+<table border="1">
+    <tr [style]="{'background-color': color}">
+       <td>
+            <!-- Property Binding -->
+            <input type = "text" [value]="customerName"/>
+            <!-- Two-way Data Binding -->
+            <input type = "text" [(ngModel)]="customerName"/>
+       </td>
+       <td>
+            <!-- Event Binding -->
+            <button (click)="handleChangeClick()">Click Me</button>
+       </td>
+    </tr>
+   
+    
+</table>

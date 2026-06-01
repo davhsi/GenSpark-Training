@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Davish Profile</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <nav>
+        <div class="nav-container">
+            <div class="logo">Davish</div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#projects">Projects</a></li>
+                <li><a href="#skills">Skills</a></li>
+                <li><a href="#education">Education</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section id="home" class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Hi, I'm <span class="highlight">Davish</span></h1>
+                <p class="subtitle">Computer Science Engineer | FullStack Developer</p>
+                <p class="description">I build web applications and what not...</p>
+                <div class="stats">
+                    <div><strong>9.05 CGPA</strong> <span>B.E. CSE</span></div>
+                    <div><strong>95.83%</strong> <span>HSC</span></div>
+                    <div><strong>10+</strong> <span>Projects</span></div>
+                </div>
+                <a href="#projects" class="btn">View my work →</a>
+            </div>
+            <div class="hero-image">
+                <img src="assets/profile.png" alt="Davish" class="profile-image">
+            </div>
+        </div>
+    </section>
+
+    <section id="projects" class="projects">
+        <div class="container">
+            <h2>Featured Projects</h2>
+            <div class="projects-grid">
+                <div class="project-card">
+                    <div class="project-icon"><i class="fas fa-gamepad"></i></div>
+                    <h3>Multiplayer Fruit Ninja</h3>
+                    <p>Real-time game with WebSocket sync, live leaderboard using Redis. Built with React, Node.js, Express.</p>
+                    <div class="tech-stack">React  Node.js  Redis  WebSocket</div>
+                </div>
+                <div class="project-card">
+                    <div class="project-icon"><i class="fas fa-leaf"></i></div>
+                    <h3>Fresh Fleet</h3>
+                    <p>Health-focused grocery platform with product listings, vendor management, and AWS CloudFront for fast media delivery.</p>
+                    <div class="tech-stack">MERN  AWS S3  CloudFront</div>
+                    <a href="https://freshfleet.davish.me/" target="_blank">Live Demo →</a>
+                </div>
+                <div class="project-card">
+                    <div class="project-icon"><i class="fas fa-heartbeat"></i></div>
+                    <h3>MindFlip</h3>
+                    <p>Mental health recommendation system using NLP and sentiment analysis. MERN + Flask.</p>
+                    <div class="tech-stack">MERN  Flask  NLP</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="skills" class="skills">
+        <div class="container">
+            <h2>Technical Skills</h2>
+            <div class="skills-grid">
+                <div>
+                    <h3>Languages</h3>
+                    <ul>
+                        <li>Java, C</li>
+                        <li>JavaScript </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Frontend</h3>
+                    <ul>
+                        <li>React.js, Tailwind CSS</li>
+                        <li>Figma</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Backend</h3>
+                    <ul>
+                        <li>Node.js, Express.js</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Databases</h3>
+                    <ul>
+                        <li>MongoDB, MySQL, Redis</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>DevOps & Cloud</h3>
+                    <ul>
+                        <li>AWS (EC2, S3, CloudFront)</li>
+                        <li>Docker, Git/GitHub</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Tools</h3>
+                    <ul>
+                        <li>Postman, Vercel, VS Code</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="education" class="education">
+        <div class="container">
+            <h2>Education</h2>
+            <div class="edu-list">
+                <div class="edu-item">
+                    <h3>B.E. Computer Science & Engineering</h3>
+                    <p>Bannari Amman Institute of Technology, Sathy, Erode | 2022 – 2026</p>
+                    <p><strong>CGPA: 9.05/10.0</strong></p>
+                </div>
+                <div class="edu-item">
+                    <h3>Higher Secondary (HSC)</h3>
+                    <p>Rose Mary Matriculation Higher Secondary School | 2020 – 2022</p>
+                    <p><strong>Percentage: 95.83%</strong></p>
+                </div>
+                <div class="edu-item">
+                    <h3>SSLC</h3>
+                    <p>Rose Mary Matriculation Higher Secondary School | 2020</p>
+                    <p><strong>Percentage: 92.80%</strong></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="achievements">
+        <div class="container">
+            <h2>Achievements & Leadership</h2>
+            <div class="achievements-list">
+                <div class="achievement">
+                    <i class="fas fa-trophy"></i>
+                    <div>
+                        <h3>BIT-HACK 2023 Finalist (Cloud Domain)</h3>
+                        <p>Built a job-seeking platform using MERN + AWS EC2.</p>
+                    </div>
+                </div>
+                <div class="achievement">
+                    <i class="fas fa-chalkboard-user"></i>
+                    <div>
+                        <h3>Core Java Instructor</h3>
+                        <p>Trained 70+ students through NightClass sessions at college.</p>
+                    </div>
+                </div>
+                <div class="achievement">
+                    <i class="fas fa-users"></i>
+                    <div>
+                        <h3>Team Lead</h3>
+                        <p>Led 4-member teams in hackathon and mini-project.</p>
+                    </div>
+                </div>
+                <div class="achievement">
+                    <i class="fas fa-microphone-alt"></i>
+                    <div>
+                        <h3>Paper Presentation</h3>
+                        <p>"Blockchain and Generative AI" – Saveetha School of Engineering (Oct 2023)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2>Let's Connect</h2>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <p>I can work all day</p>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> davish.std@gmail.com</li>
+                        <li><i class="fab fa-github"></i> <a href="https://github.com/davhsi">github.com/davhsi</a></li>
+                    </ul>
+                </div>
+                <form class="contact-form">
+                    <input type="text" placeholder="Your name" required>
+                    <input type="email" placeholder="Your email" required>
+                    <textarea rows="4" placeholder="Your message"></textarea>
+                    <button type="submit" class="btn">Send message</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>2026 Davish. All information is true to the best of my knowledge.</p>
+            <p style="margin-top: 0.5rem; color: #94a3b8; font-size: 0.8rem;">Made by Davish</p>
+        </div>
+    </footer>
+
+    <script>
+        // Simple smooth scroll for navigation
+        document.querySelectorAll('nav a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const target = document.querySelector(targetId);
+                if(target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>¬
