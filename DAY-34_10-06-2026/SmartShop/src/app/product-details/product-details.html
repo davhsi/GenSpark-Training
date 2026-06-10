@@ -1,0 +1,42 @@
+<div class="container mt-5">
+  <div class="mb-3">
+    <a class="btn btn-secondary" routerLink="/products">Back to Products</a>
+  </div>
+
+  @if (loading()) {
+    <div class="text-center mt-5">
+      Loading...
+    </div>
+  }
+
+  @if (errorMessage()) {
+    <div class="alert alert-danger">{{ errorMessage() }}</div>
+  }
+
+  @if (product(); as product) {
+    <div class="card">
+      <div class="row g-0">
+        <div class="col-md-4">
+          <img [src]="product.thumbnail" class="img-fluid rounded-start" alt="{{ product.title }}">
+        </div>
+        <div class="col-md-8">
+          <div class="card-body">
+            <h2 class="card-title">{{ product.title }}</h2>
+            <p>Rating: {{ product.rating }}</p>
+            
+            <p>{{ product.brand || 'SmartShop Brand' }} - {{ product.category || 'General' }}</p>
+            
+            <h3>$ {{ product.price }}</h3>
+            
+            <h5>Description</h5>
+            <p>{{ product.description }}</p>
+            
+            <div class="mt-4">
+              <button class="btn btn-primary">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

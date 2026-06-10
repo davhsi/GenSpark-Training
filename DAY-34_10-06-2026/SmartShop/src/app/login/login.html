@@ -1,0 +1,58 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h1 class="card-title text-center">SmartShop Portal</h1>
+          <p class="text-center">Sign in to your account</p>
+
+          <form (ngSubmit)="handleLogin()">
+            <div class="mb-3">
+              <label for="username" class="form-label">Username</label>
+              <input
+                type="text"
+                id="username"
+                class="form-control"
+                placeholder="Enter your username"
+                [formField]="loginForm.username"
+              />
+              @for (error of loginForm.username().errors(); track error.message) {
+                <div class="text-danger">{{ error.message }}</div>
+              }
+            </div>
+
+            <div class="mb-3">
+              <label for="password" class="form-label">Password</label>
+              <input
+                type="password"
+                id="password"
+                class="form-control"
+                placeholder="Enter your password"
+                [formField]="loginForm.password"
+              />
+              @for (error of loginForm.password().errors(); track error.message) {
+                <div class="text-danger">{{ error.message }}</div>
+              }
+            </div>
+
+            @if (errorMessage()) {
+              <div class="alert alert-danger">{{ errorMessage() }}</div>
+            }
+
+            <button
+              type="submit"
+              class="btn btn-primary w-100"
+              [disabled]="progress() || loginForm().invalid()"
+            >
+              @if (progress()) {
+                Loading...
+              } @else {
+                Sign In
+              }
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

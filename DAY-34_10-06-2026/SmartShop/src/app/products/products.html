@@ -1,0 +1,30 @@
+<div class="container mt-4">
+  <h2 class="text-white">Products</h2>
+  <p class="text-white">Browse our latest items</p>
+
+  @if (loading()) {
+    <div class="text-center mt-5">Loading products...</div>
+  }
+
+  @if (errorMessage()) {
+    <div class="alert alert-danger">{{ errorMessage() }}</div>
+  }
+
+  <div class="row mt-4">
+    @for (product of products(); track product.id) {
+      <div class="col-md-4 mb-4">
+        <div class="card">
+          <img [src]="product.thumbnail" class="card-img-top" alt="{{ product.title }}" style="height: 200px; object-fit: cover;" />
+          <div class="card-body">
+            <h5 class="card-title">{{ product.title }}</h5>
+            <h6 class="card-subtitle mb-2 text-muted">{{ product.brand || 'SmartShop' }}</h6>
+            <p class="card-text">{{ product.description || 'Great value product from SmartShop.' }}</p>
+            <p><strong>$ {{ product.price }}</strong></p>
+            <p>Rating: {{ product.rating }}</p>
+            <a class="btn btn-primary" [routerLink]="['/products', product.id]">View Details</a>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>
