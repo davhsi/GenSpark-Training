@@ -1,0 +1,20 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# requirements.txt — Exact pinned dependencies for the Requirement Triage System
+#
+# Install with:  pip install -r requirements.txt
+# ─────────────────────────────────────────────────────────────────────────────
+
+# GroqCloud official Python SDK — wraps the REST API, handles auth headers,
+# and exposes typed response objects including RateLimitError for tenacity.
+groq>=0.9.0
+
+# Loads .env files into os.environ at process startup.
+python-dotenv>=1.0.0
+
+# Retry library with decorator support, exponential backoff, and logging hooks.
+# Used to wrap the Groq API call against 429 Too Many Requests responses.
+tenacity>=8.2.0
+
+# PDF text extraction. Allows the analyzer to ingest .pdf requirement documents
+# in addition to plain-text .txt and .md files.
+pdfplumber>=0.10.0

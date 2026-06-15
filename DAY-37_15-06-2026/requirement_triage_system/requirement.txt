@@ -1,0 +1,12 @@
+Hi Team,
+
+We need a simple web app for employee leave requests. 
+
+Employees should be able to log in, see their remaining vacation days, and submit a new request with start and end dates. 
+
+Managers need a screen to see all requests from their team and click approve or deny. When a decision is made, the employee should get an email.
+
+It needs to be mobile-friendly and we want it to be fast. We also need it to use our existing company single sign-on.
+
+Thanks,
+John
