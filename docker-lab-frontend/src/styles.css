@@ -1,0 +1,17 @@
+/* You can add global styles to this file, and also import other style files */
+
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Geist', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --color-zinc-950: #09090b;
+  --color-zinc-900: #18181b;
+  --color-zinc-800: #27272a;
+  --color-emerald-500: #10b981;
+  --color-emerald-400: #34d399;
+}
+
+body {
+  @apply bg-zinc-950 text-white font-sans antialiased min-h-[100dvh] m-0;
+}
